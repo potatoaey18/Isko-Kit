@@ -711,7 +711,7 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                width: 280px; /* Full width when visible */
+                width: 60px;
                 padding: 2rem 1.5rem;
                 transform: translateX(-100%);
                 transition: transform var(--transition);
@@ -723,12 +723,12 @@
 
             .sidebar.minimized,
             .sidebar.expanded {
-                width: 280px; /* Full width on mobile when visible */
+                width: 60px;
                 padding: 2rem 1.5rem;
             }
 
             .sidebar:hover:not(.hidden) {
-                width: 280px;
+                width: 60px;
                 padding: 2rem 1.5rem;
             }
 
@@ -736,7 +736,7 @@
                 margin-left: 0;
                 width: 100%;
                 padding: 1rem;
-                padding-top: 4rem; /* Space for toggle button */
+                padding-top: 4rem; 
                 padding-bottom: 5rem;
             }
 
@@ -1242,6 +1242,7 @@
             <button class="btn-secondary" onclick="addSubject()">
                 <i class="fas fa-plus"></i> Add Another Subject
             </button>
+            <br>
             
             <button class="btn-primary" onclick="calculateGWA()">
                 <i class="fas fa-calculator"></i> Calculate GWA
@@ -1676,7 +1677,7 @@
         }
 
         function toggleMinimize() {
-            if (window.innerWidth <= 768) return; // No minimize on mobile
+            if (window.innerWidth <= 768) return;
 
             const sidebar = document.querySelector('.sidebar');
             const content = document.querySelector('.content');
