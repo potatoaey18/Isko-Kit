@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isko-Kit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --pup-maroon: #8B0000;
+            --pup-gold: #FFD700;
+            --pup-dark-maroon: #660000;
+            --pup-light-gold: #FFF8DC;
+            --primary-gradient: linear-gradient(135deg, #8B0000 0%, #A52A2A 100%);
+            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --card-shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: #1e293b;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--primary-gradient);
+            padding: 2rem 1.5rem;
+            height: 100vh;
+            position: fixed;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-icon i {
+            font-size: 1.8rem;
+            color: var(--pup-maroon);
+        }
+
+        .sidebar h2 {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            color: var(--pup-gold);
+            min-width: 20px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .content {
+            margin-left: 300px;
+            padding: 2rem;
+            width: calc(100% - 300px);
+            flex: 1 0 auto; /* Grow to fill available space */
+            transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 110;
+            background: var(--pup-maroon);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .hamburger:hover {
+            background: var(--pup-dark-maroon);
+        }
+
+        .hamburger:focus {
+            outline: 2px solid var(--pup-gold);
+            outline-offset: 2px;
+        }
+
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gold-gradient);
+        }
+
+        .container:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .student-message {
+            background: linear-gradient(135deg, var(--pup-light-gold) 0%, #fff9c4 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--pup-gold);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-message::before {
+            content: '💡';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea,
+        .form-file {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #1e293b;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus,
+        .form-file:focus {
+            outline: none;
+            border-color: var(--pup-maroon);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+            background: white;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--gold-gradient);
+            border: none;
+            border-radius: 8px;
+            color: var(--pup-maroon);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid var(--pup-maroon);
+            border-radius: 8px;
+            color: var(--pup-maroon);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--pup-maroon);
+            color: white;
+        }
+
+        .result-card,
+        .error-card {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+
+        .error-card {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--pup-maroon);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-title i {
+            margin-right: 0.5rem;
+            color: #0ea5e9;
+        }
+
+        .info-list {
+            list-style: none;
+            color: #0f172a;
+        }
+
+        .info-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-table th {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            padding: 0.875rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .schedule-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .color-0 { background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important; }
+        .color-1 { background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%) !important; }
+        .color-2 { background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 100%) !important; }
+        .color-3 { background: linear-gradient(135deg, #fefce8 0%, #fef08a 100%) !important; }
+        .color-4 { background: linear-gradient(135deg, #f0fdfa 0%, #a7f3d0 100%) !important; }
+
+        .chart-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.2rem;
+            color: var(--pup-maroon);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--pup-maroon);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .welcome-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--pup-gold);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gold-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: var(--pup-maroon);
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--pup-maroon);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .footer {
+            background: var(--primary-gradient);
+            color: white;
+            padding:1rem;
+            flex-shrink: 0;
+            box-shadow: var(--card-shadow);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--pup-gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-links a:hover {
+                transform: none;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                z-index: 100;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+                padding-top: 4rem;
+                transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 99;
+                opacity: 0;
+                transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+            body.sidebar-open {
+                overflow: hidden;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .page-subtitle {
+                font-size: 1rem;
+            }
+
+            .form-input,
+            .form-select,
+            .form-textarea,
+            .form-file {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <noscript>
+        <style>
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .hamburger {
+                display: none;
+            }
+            .content {
+                margin-left: 280px;
+            }
+            @media (max-width: 768px) {
+                .content {
+                    margin-left: 0;
+                }
+            }
+        </style>
+        <div class="error-card" style="display: block; margin: 1rem;">
+            Please enable JavaScript to use the sidebar navigation.
+        </div>
+    </noscript>
+    
+    <button class="hamburger">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="overlay"></div>
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2>Isko-Kit</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="#welcome" class="nav-link active">
+                    <i class="fas fa-home"></i> Welcome
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tuition" class="nav-link">
+                    <i class="fas fa-calculator"></i> Tuition & Fees
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#grade" class="nav-link">
+                    <i class="fas fa-pencil-alt"></i> Grade Calculator
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#gpa" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i> GWA Calculator
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#schedule" class="nav-link">
+                    <i class="fas fa-calendar"></i> Schedule Maker
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#load" class="nav-link">
+                    <i class="fas fa-book"></i> Study Load Checker
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#budget" class="nav-link">
+                    <i class="fas fa-wallet"></i> Budget Tracker
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#internship" class="nav-link">
+                    <i class="fas fa-briefcase"></i> Internship Tracker
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#enrollment" class="nav-link">
+                    <i class="fas fa-check-square"></i> Enrollment Guide
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div id="welcome" class="container">
+            <div class="page-header">
+                <h1 class="page-title">Isko-Kit</h1>
+                <p class="page-subtitle">Your one-stop solution for academic success</p>
+            </div>
+            
+            <div class="student-message">
+                <p><strong>Hi, fellow PUPians!</strong> From a Student, for the Students. Mula sa iyo, Para sa Bayan! 🎓</p>
+            </div>
+
+            <div class="welcome-grid">
+                <div class="feature-card" data-section="tuition">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="feature-title">Tuition Calculator</div>
+                    <div class="feature-description">Estimate your tuition fees and plan your finances with our comprehensive calculator.</div>
+                </div>
+                <div class="feature-card" data-section="grade">
+                    <div class="feature-icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                    <div class="feature-title">Grade Calculator</div>
+                    <div class="feature-description">Calculate your current grades and see what you need to achieve your target.</div>
+                </div>
+                <div class="feature-card" data-section="gpa">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="feature-title">GWA Calculator</div>
+                    <div class="feature-description">Track your General Weighted Average across all subjects and semesters.</div>
+                </div>
+                <div class="feature-card" data-section="schedule">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="feature-title">Schedule Maker</div>
+                    <div class="feature-description">Create and visualize your class schedule with our interactive planner.</div>
+                </div>
+                <div class="feature-card" data-section="budget">
+                    <div class="feature-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="feature-title">Budget Tracker</div>
+                    <div class="feature-description">Manage your finances and track your expenses throughout the semester.</div>
+                </div>
+                <div class="feature-card" data-section="internship">
+                    <div class="feature-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="feature-title">Internship Tracker</div>
+                    <div class="feature-description">Log and monitor your internship hours to meet graduation requirements.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tuition" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Tuition & Fees Calculator</h1>
+                <p class="page-subtitle">Get an accurate estimate of your school fees</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="units">
+                        <i class="fas fa-book"></i> Number of Units (1-24)
+                    </label>
+                    <input type="number" id="units" class="form-input" min="1" max="24" value="18" placeholder="e.g., 18">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="tutorialUnits">
+                        <i class="fas fa-chalkboard-teacher"></i> Tutorial Units
+                    </label>
+                    <input type="number" id="tutorialUnits" class="form-input" min="0" value="0" placeholder="e.g., 3">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="courseType">
+                        <i class="fas fa-graduation-cap"></i> Course Type
+                    </label>
+                    <select id="courseType" class="form-select">
+                        <option value="general">General (No Lab)</option>
+                        <option value="officeAdmin">Office Administration/HRM/Food Tech/Nutrition</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="computer">Computer Subjects</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="isFreshmanEng">
+                        <i class="fas fa-user-graduate"></i> Engineering Freshman?
+                    </label>
+                    <select id="isFreshmanEng" class="form-select">
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="discount">
+                        <i class="fas fa-percentage"></i> Discount Type
+                    </label>
+                    <select id="discount" class="form-select">
+                        <option value="0">No Discount</option>
+                        <option value="0.1">10% Sibling Discount</option>
+                        <option value="0.2">20% Scholarship</option>
+                        <option value="0.5">50% Academic Scholarship</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="calculateTuition()">
+                <i class="fas fa-calculator"></i> Calculate Total Fees
+            </button>
+            
+            <div id="tuition-error" class="error-card"></div>
+            <div id="tuition-result" class="result-card"></div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i> How It Works
+                </div>
+                <ul class="info-list">
+                    <li>Tuition: ₱12 per unit, ₱40 per tutorial unit</li>
+                    <li>Mandatory fees include registration, library, medical, cultural, and other institutional fees</li>
+                    <li>Laboratory fees vary by course type</li>
+                    <li>Engineering freshmen have an additional deposit fee</li>
+                    <li>Discounts apply only to tuition costs</li>
+                    <li>Always verify final fees with PUP's official offices</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="grade" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Grade Calculator</h1>
+                <p class="page-subtitle">Calculate your weighted grades accurately</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="quizWeight">
+                        <i class="fas fa-question-circle"></i> Quiz Weight (%)
+                    </label>
+                    <input type="number" id="quizWeight" class="form-input" min="0" max="100" value="30">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="quizScore">
+                        <i class="fas fa-pencil-alt"></i> Quiz Score (%)
+                    </label>
+                    <input type="number" id="quizScore" class="form-input" min="0" max="100" value="85">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="projectWeight">
+                        <i class="fas fa-project-diagram"></i> Project Weight (%)
+                    </label>
+                    <input type="number" id="projectWeight" class="form-input" min="0" max="100" value="40">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="projectScore">
+                        <i class="fas fa-tasks"></i> Project Score (%)
+                    </label>
+                    <input type="number" id="projectScore" class="form-input" min="0" max="100" value="90">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="examWeight">
+                        <i class="fas fa-file-alt"></i> Exam Weight (%)
+                    </label>
+                    <input type="number" id="examWeight" class="form-input" min="0" max="100" value="30">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="examScore">
+                        <i class="fas fa-edit"></i> Exam Score (%)
+                    </label>
+                    <input type="number" id="examScore" class="form-input" min="0" max="100" value="75">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="calculateGrade()">
+                <i class="fas fa-calculator"></i> Calculate Final Grade
+            </button>
+            
+            <div id="grade-error" class="error-card"></div>
+            <div id="grade-result" class="result-card"></div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-lightbulb"></i> Quick Tips
+                </div>
+                <ul class="info-list">
+                    <li>All weight percentages must add up to 100%</li>
+                    <li>Passing grade is typically 75% or higher</li>
+                    <li>Enter your current scores to see what you need for your target grade</li>
+                    <li>Use decimal points for precise calculations</li>
+                    <li>Adjust weights based on your professor's grading system</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="gpa" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">GWA Calculator</h1>
+                <p class="page-subtitle">Calculate your General Weighted Average</p>
+            </div>
+            
+            <div id="gwa-subjects">
+                <div class="form-grid subject-entry">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-book"></i> Subject Name
+                        </label>
+                        <input type="text" class="form-input subject-name" placeholder="e.g., Mathematics">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-weight"></i> Units
+                        </label>
+                        <input type="number" class="form-input subject-units" min="1" max="5" value="3">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-star"></i> Grade (1.0-5.0)
+                        </label>
+                        <input type="number" class="form-input subject-grade" min="1" max="5" step="0.25" value="1.75">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-secondary" onclick="addSubject()">
+                <i class="fas fa-plus"></i> Add Another Subject
+            </button>
+            
+            <button class="btn-primary" onclick="calculateGWA()">
+                <i class="fas fa-calculator"></i> Calculate GWA
+            </button>
+            
+            <div id="gwa-error" class="error-card"></div>
+            <div id="gwa-result" class="result-card"></div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i> PUP Grading System
+                </div>
+                <ul class="info-list">
+                    <li>1.00 - 1.24: Excellent (97-100%)</li>
+                    <li>1.25 - 1.49: Very Good (94-96%)</li>
+                    <li>1.50 - 1.74: Very Good (91-93%)</li>
+                    <li>1.75 - 2.24: Good (85-90%)</li>
+                    <li>2.25 - 2.74: Satisfactory (80-84%)</li>
+                    <li>2.75 - 2.99: Fair (78-79%)</li>
+                    <li>3.00: Passed (75-77%)</li>
+                    <li>5.00: Failed (Below 75%)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="schedule" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Schedule Maker</h1>
+                <p class="page-subtitle">Create your weekly class schedule.  Just take a Screenshot when done!</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="subjectName">
+                        <i class="fas fa-book"></i> Subject Name
+                    </label>
+                    <input type="text" id="subjectName" class="form-input" placeholder="e.g., Data Structures">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="instructor">
+                        <i class="fas fa-user"></i> Instructor
+                    </label>
+                    <input type="text" id="instructor" class="form-input" placeholder="e.g., Prof. Santos">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="room">
+                        <i class="fas fa-door-open"></i> Room
+                    </label>
+                    <input type="text" id="room" class="form-input" placeholder="e.g., NETH 102">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="day">
+                        <i class="fas fa-calendar-day"></i> Day
+                    </label>
+                    <select id="day" class="form-select">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="startTime">
+                        <i class="fas fa-clock"></i> Start Time
+                    </label>
+                    <input type="time" id="startTime" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="endTime">
+                        <i class="fas fa-clock"></i> End Time
+                    </label>
+                    <input type="time" id="endTime" class="form-input">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="addScheduleEntry()">
+                <i class="fas fa-plus"></i> Add to Schedule
+            </button>
+            
+            <button class="btn-secondary" onclick="clearSchedule()">
+                <i class="fas fa-trash"></i> Clear Schedule
+            </button>
+            
+            <div id="schedule-error" class="error-card"></div>
+            
+            <div id="schedule-display" style="display: none;">
+                <h3 style="margin-top: 2rem; color: var(--pup-maroon);">Your Weekly Schedule</h3>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="load" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Study Load Checker</h1>
+                <p class="page-subtitle">Monitor your academic workload</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="totalUnits">
+                        <i class="fas fa-book-open"></i> Total Units Enrolled
+                    </label>
+                    <input type="number" id="totalUnits" class="form-input" min="1" max="30" value="18">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="majorSubjects">
+                        <i class="fas fa-star"></i> Major Subjects Count
+                    </label>
+                    <input type="number" id="majorSubjects" class="form-input" min="0" max="10" value="4">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="labSubjects">
+                        <i class="fas fa-flask"></i> Laboratory Subjects Count
+                    </label>
+                    <input type="number" id="labSubjects" class="form-input" min="0" max="10" value="2">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="yearLevel">
+                        <i class="fas fa-graduation-cap"></i> Year Level
+                    </label>
+                    <select id="yearLevel" class="form-select">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                        <option value="5">5th Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="checkStudyLoad()">
+                <i class="fas fa-chart-line"></i> Analyze Study Load
+            </button>
+            
+            <div id="load-result" class="result-card"></div>
+            
+            <div class="stats-grid" id="load-stats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-value" id="units-stat">0</div>
+                    <div class="stat-label">Total Units</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="hours-stat">0</div>
+                    <div class="stat-label">Study Hours/Week</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="stat-value" id="difficulty-stat">-</div>
+                    <div class="stat-label">Status</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="budget" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Budget Tracker</h1>
+                <p class="page-subtitle">Manage your semester finances</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="monthlyAllowance">
+                        <i class="fas fa-money-bill"></i> Monthly Allowance (₱)
+                    </label>
+                    <input type="number" id="monthlyAllowance" class="form-input" min="0" value="5000">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="tuitionFees">
+                        <i class="fas fa-school"></i> Tuition & Fees (₱)
+                    </label>
+                    <input type="number" id="tuitionFees" class="form-input" min="0" value="2500">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="transportationCost">
+                        <i class="fas fa-bus"></i> Transportation (₱/month)
+                    </label>
+                    <input type="number" id="transportationCost" class="form-input" min="0" value="1500">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="foodCost">
+                        <i class="fas fa-utensils"></i> Food & Meals (₱/month)
+                    </label>
+                    <input type="number" id="foodCost" class="form-input" min="0" value="2000">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="booksCost">
+                        <i class="fas fa-book"></i> Books & Supplies (₱/semester)
+                    </label>
+                    <input type="number" id="booksCost" class="form-input" min="0" value="3000">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="miscellaneous">
+                        <i class="fas fa-shopping-bag"></i> Miscellaneous (₱/month)
+                    </label>
+                    <input type="number" id="miscellaneous" class="form-input" min="0" value="1000">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="calculateBudget()">
+                <i class="fas fa-calculator"></i> Calculate Budget
+            </button>
+            
+            <div id="budget-result" class="result-card"></div>
+            
+            <div class="stats-grid" id="budget-stats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-value" id="total-income">₱0</div>
+                    <div class="stat-label">Semester Income</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="stat-value" id="total-expenses">₱0</div>
+                    <div class="stat-label">Total Expenses</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <div class="stat-value" id="remaining-budget">₱0</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="internship" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Internship Tracker</h1>
+                <p class="page-subtitle">Track your OJT hours based on work dates</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="requiredHours">
+                        <i class="fas fa-clock"></i> Required Hours
+                    </label>
+                    <input type="number" id="requiredHours" class="form-input" min="1" value="300">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="startDate">
+                        <i class="fas fa-calendar-day"></i> Start Date
+                    </label>
+                    <input type="date" id="startDate" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="lastWorkedDate">
+                        <i class="fas fa-calendar-day"></i> Date Last Worked
+                    </label>
+                    <input type="date" id="lastWorkedDate" class="form-input">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="calculateInternship()">
+                <i class="fas fa-chart-pie"></i> Calculate Progress
+            </button>
+            
+            <div id="internship-result" class="result-card"></div>
+            
+            <div class="stats-grid" id="internship-stats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-value" id="completion-percentage">0%</div>
+                    <div class="stat-label">Completion</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-value" id="remaining-hours">0</div>
+                    <div class="stat-label">Hours Left</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value" id="estimated-days">0</div>
+                    <div class="stat-label">Days to Complete</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="enrollment" class="container hidden">
+            <div class="page-header">
+                <h1 class="page-title">Enrollment Guide</h1>
+                <p class="page-subtitle">Step-by-step enrollment assistance</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-list-ol"></i> Pre-Enrollment Checklist
+                </div>
+                <ul class="info-list">
+                    <li>Check your academic standing and clearances</li>
+                    <li>Consult with your academic adviser</li>
+                    <li>Prepare required documents (Form 137, certificates, etc.)</li>
+                    <li>Review the curriculum and plan your subjects</li>
+                    <li>Check scholarship eligibility and requirements</li>
+                    <li>Ensure you have a stable internet connection for online enrollment</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-graduation-cap"></i> Enrollment Process
+                </div>
+                <ul class="info-list">
+                    <li>Access the PUP Student Information System (SIS)</li>
+                    <li>Log in using your student credentials</li>
+                    <li>Select subjects according to your curriculum</li>
+                    <li>Check for schedule conflicts and room availability</li>
+                    <li>Submit your enrollment form for validation</li>
+                    <li>Wait for approval from the registrar's office</li>
+                    <li>Print your Certificate of Registration (COR)</li>
+                    <li>Process payment for tuition and fees</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-file-alt"></i> Required Documents
+                </div>
+                <ul class="info-list">
+                    <li>Completely filled enrollment form</li>
+                    <li>Certificate of Registration (COR)</li>
+                    <li>Official receipt of payment</li>
+                    <li>Copy of grades from previous semester</li>
+                    <li>Medical certificate (if required)</li>
+                    <li>Scholarship forms</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-exclamation-triangle"></i> Important Reminders
+                </div>
+                <ul class="info-list">
+                    <li>Enroll within the designated enrollment period</li>
+                    <li>Late enrollment may incur additional fees</li>
+                    <li>Keep all enrollment document copies</li>
+                    <li>Immediately report any discrepancies</li>
+                    <li>Regularly check your official schedule</li>
+                    <li>Attend first class day to avoid being dropped</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2025 Isko-Kit. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        let scheduleEntries = [];
+        let colorIndex = 0;
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.overlay');
+            const body = document.body;
+            const hamburgerIcon = document.querySelector('.hamburger i');
+
+            const isActive = sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            body.classList.toggle('sidebar-open');
+
+            sidebar.style.transform = isActive ? 'translateX(0)' : 'translateX(-100%)';
+
+            hamburgerIcon.classList.toggle('fa-bars', !isActive);
+            hamburgerIcon.classList.toggle('fa-times', isActive);
+        }
+
+        function navigateTo(section) {
+            document.querySelectorAll('.container').forEach(container => {
+                container.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById(section);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                window.scrollTo({
+                    top: targetSection.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+
+            const targetLink = document.querySelector(`a[href="#${section}"]`);
+            if (targetLink) {
+                targetLink.classList.add('active');
+            }
+
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('href').substring(1);
+                navigateTo(section);
+            });
+        });
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                if (section) {
+                    navigateTo(section);
+                }
+            });
+        });
+
+        document.querySelector('.hamburger').addEventListener('click', toggleSidebar);
+
+        const overlay = document.querySelector('.overlay');
+        if (overlay) {
+            overlay.addEventListener('click', toggleSidebar);
+        }
+
+        document.addEventListener('touchmove', (e) => {
+            if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        function calculateTuition() {
+            const units = parseInt(document.getElementById('units').value) || 0;
+            const tutorialUnits = parseInt(document.getElementById('tutorialUnits').value) || 0;
+            const courseType = document.getElementById('courseType').value;
+            const isFreshmanEng = document.getElementById('isFreshmanEng').value === 'yes';
+            const discount = parseFloat(document.getElementById('discount').value || 0);
+
+            const errorDiv = document.getElementById('tuition-error');
+            const resultDiv = document.getElementById('tuition-result');
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            if (units < 1 || units > 24) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Units must be between 1 and 24.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const tuitionCost = (units * 12) + (tutorialUnits * 40);
+            let mandatoryFees = 1697;
+            let labFees = 0;
+            switch (courseType) {
+                case 'officeAdmin':
+                    labFees = 500;
+                    break;
+                case 'engineering':
+                    labFees = 1000;
+                    break;
+                case 'computer':
+                    labFees = 750;
+                    break;
+                default:
+                    labFees = 0;
+            }
+            
+            let depositFee = isFreshmanEng ? 1000 : 0;
+            const discountAmount = tuitionCost * discount;
+            const discountedTuition = tuitionCost - discountAmount;
+            const totalFees = discountedTuition + mandatoryFees + labFees + depositFee;
+
+            resultDiv.innerHTML = `
+                <div class="result-value">Total Fees: ₱${totalFees.toLocaleString()}</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Breakdown:</strong><br>
+                    • Tuition (${units} units × ₱12): ₱${(units * 12).toLocaleString()}<br>
+                    • Tutorial (${tutorialUnits} units × ₱40): ₱${(tutorialUnits * 40).toLocaleString()}<br>
+                    • Discount Applied: -₱${discountAmount.toLocaleString()}<br>
+                    • Mandatory Fees: ₱${mandatoryFees.toLocaleString()}<br>
+                    • Laboratory Fees: ₱${labFees.toLocaleString()}<br>
+                    ${depositFee ? `• Engineering Deposit: ₱${depositFee.toLocaleString()}<br>` : ''}
+                    <br><strong>Total: ₱${totalFees.toLocaleString()}</strong>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function calculateGrade() {
+            const quizWeight = parseFloat(document.getElementById('quizWeight').value) || 0;
+            const quizScore = parseFloat(document.getElementById('quizScore').value) || 0;
+            const projectWeight = parseFloat(document.getElementById('projectWeight').value) || 0;
+            const projectScore = parseFloat(document.getElementById('projectScore').value) || 0;
+            const examWeight = parseFloat(document.getElementById('examWeight').value) || 0;
+            const examScore = parseFloat(document.getElementById('examScore').value) || 0;
+
+            const errorDiv = document.getElementById('grade-error');
+            const resultDiv = document.getElementById('grade-result');
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            const totalWeight = quizWeight + projectWeight + examWeight;
+            if (Math.abs(totalWeight - 100) > 0.01) {
+                errorDiv.innerHTML = `<strong>Error:</strong> Total weights must equal 100%. Current total: ${totalWeight}%`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const finalGrade = (quizScore * quizWeight/100) + (projectScore * projectWeight/100) + (examScore * examWeight/100);
+            
+            let letterGrade, status;
+            if (finalGrade >= 97) {
+                letterGrade = 'A+';
+                status = 'Excellent';
+            } else if (finalGrade >= 94) {
+                letterGrade = 'A';
+                status = 'Very Good';
+            } else if (finalGrade >= 90) {
+                letterGrade = 'A-';
+                status = 'Very Good';
+            } else if (finalGrade >= 85) {
+                letterGrade = 'B+';
+                status = 'Good';
+            } else if (finalGrade >= 80) {
+                letterGrade = 'B';
+                status = 'Satisfactory';
+            } else if (finalGrade >= 78) {
+                letterGrade = 'B-';
+                status = 'Fair';
+            } else if (finalGrade >= 75) {
+                letterGrade = 'C';
+                status = 'Passed';
+            } else {
+                letterGrade = 'F';
+                status = 'Failed';
+            }
+
+            resultDiv.innerHTML = `
+                <div class="result-value">Final Grade: ${finalGrade.toFixed(2)}% (${letterGrade})</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Status:</strong> ${status}<br>
+                    <strong>Grade Breakdown:</strong><br>
+                    • Quiz: ${quizScore}% × ${quizWeight}% = ${(quizScore * quizWeight/100).toFixed(2)}<br>
+                    • Project: ${projectScore}% × ${projectWeight}% = ${(projectScore * projectWeight/100).toFixed(2)}<br>
+                    • Exam: ${examScore}% × ${examWeight}% = ${(examScore * examWeight/100).toFixed(2)}<br>
+                    <br><strong>Final: ${finalGrade.toFixed(2)}%</strong>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function addSubject() {
+            const container = document.getElementById('gwa-subjects');
+            const subjectEntry = document.createElement('div');
+            subjectEntry.className = 'form-grid subject-entry';
+            subjectEntry.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-book"></i> Subject Name
+                    </label>
+                    <input type="text" class="form-input subject-name" placeholder="e.g., Physics">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-weight"></i> Units
+                    </label>
+                    <input type="number" class="form-input subject-units" min="1" max="5" value="3">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-star"></i> Grade (1.0-5.0)
+                    </label>
+                    <input type="number" class="form-input subject-grade" min="1" max="5" step="0.25" value="1.75">
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: end;">
+                    <button type="button" class="btn-secondary" onclick="removeSubject(this)" style="margin-top: 0; width: auto; padding: 0.5rem 1rem;">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+            `;
+            container.appendChild(subjectEntry);
+        }
+
+        function removeSubject(button) {
+            button.closest('.subject-entry').remove();
+        }
+
+        function calculateGWA() {
+            const subjects = document.querySelectorAll('.subject-entry');
+            const errorDiv = document.getElementById('gwa-error');
+            const resultDiv = document.getElementById('gwa-result');
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            if (subjects.length === 0) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Please add at least one subject.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            let totalWeightedGrades = 0;
+            let totalUnits = 0;
+            let subjectDetails = [];
+
+            for (let subject of subjects) {
+                const name = subject.querySelector('.subject-name').value.trim();
+                const units = parseFloat(subject.querySelector('.subject-units').value) || 0;
+                const grade = parseFloat(subject.querySelector('.subject-grade').value) || 0;
+
+                if (!name) {
+                    errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all subject names.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (units <= 0 || grade < 1 || grade > 5) {
+                    errorDiv.innerHTML = '<strong>Error:</strong> Please enter valid units and grades for all subjects.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                totalWeightedGrades += grade * units;
+                totalUnits += units;
+                subjectDetails.push({ name, units, grade });
+            }
+
+            const gwa = totalWeightedGrades / totalUnits;
+            
+            let standing;
+            if (gwa <= 1.24) {
+                standing = 'Excellent';
+            } else if (gwa <= 1.49) {
+                standing = 'Very Good';
+            } else if (gwa <= 1.74) {
+                standing = 'Very Good';
+            } else if (gwa <= 2.24) {
+                standing = 'Good';
+            } else if (gwa <= 2.74) {
+                standing = 'Satisfactory';
+            } else if (gwa <= 2.99) {
+                standing = 'Fair';
+            } else if (gwa <= 3.00) {
+                standing = 'Passed';
+            } else {
+                standing = 'Failed';
+            }
+
+            let detailsHTML = '<strong>Subject Breakdown:</strong><br>';
+            subjectDetails.forEach(subject => {
+                detailsHTML += `• ${subject.name}: ${subject.units} units × ${subject.grade} = ${(subject.units * subject.grade).toFixed(2)}<br>`;
+            });
+
+            resultDiv.innerHTML = `
+                <div class="result-value">GWA: ${gwa.toFixed(2)}</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Academic Standing:</strong> ${standing}<br>
+                    ${detailsHTML}
+                    <br><strong>Total Units:</strong> ${totalUnits}<br>
+                    <strong>Total Weighted Grades:</strong> ${totalWeightedGrades.toFixed(2)}<br>
+                    <strong>GWA:</strong> ${gwa.toFixed(2)}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function addScheduleEntry() {
+            const subjectName = document.getElementById('subjectName').value.trim();
+            const instructor = document.getElementById('instructor').value.trim();
+            const room = document.getElementById('room').value.trim();
+            const day = document.getElementById('day').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            const errorDiv = document.getElementById('schedule-error');
+            const displayDiv = document.getElementById('schedule-display');
+            const scheduleBody = document.getElementById('schedule-body');
+
+            errorDiv.style.display = 'none';
+
+            if (!subjectName || !instructor || !room || !startTime || !endTime) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all fields.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (startTime >= endTime) {
+                errorDiv.innerHTML = '<strong>Error:</strong> End time must be after start time.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            scheduleEntries.push({
+                subject: subjectName,
+                instructor,
+                room,
+                day,
+                startTime,
+                endTime,
+                color: `color-${colorIndex % 5}`
+            });
+            colorIndex++;
+
+            scheduleEntries.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            updateScheduleTable();
+
+            displayDiv.style.display = 'block';
+
+            document.getElementById('subjectName').value = '';
+            document.getElementById('instructor').value = '';
+            document.getElementById('room').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+        }
+
+        function updateScheduleTable() {
+            const scheduleBody = document.getElementById('schedule-body');
+            scheduleBody.innerHTML = '';
+
+            const timeSlots = {};
+            scheduleEntries.forEach(entry => {
+                const timeKey = `${entry.startTime}-${entry.endTime}`;
+                if (!timeSlots[timeKey]) {
+                    timeSlots[timeKey] = {
+                        startTime: entry.startTime,
+                        endTime: entry.endTime,
+                        days: { Monday: null, Tuesday: null, Wednesday: null, Thursday: null, Friday: null, Saturday: null }
+                    };
+                }
+                timeSlots[timeKey].days[entry.day] = entry;
+            });
+
+            Object.values(timeSlots).forEach(slot => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${slot.startTime} - ${slot.endTime}</td>
+                    <td class="${slot.days.Monday ? slot.days.Monday.color : ''}">${slot.days.Monday ? formatScheduleEntry(slot.days.Monday) : ''}</td>
+                    <td class="${slot.days.Tuesday ? slot.days.Tuesday.color : ''}">${slot.days.Tuesday ? formatScheduleEntry(slot.days.Tuesday) : ''}</td>
+                    <td class="${slot.days.Wednesday ? slot.days.Wednesday.color : ''}">${slot.days.Wednesday ? formatScheduleEntry(slot.days.Wednesday) : ''}</td>
+                    <td class="${slot.days.Thursday ? slot.days.Thursday.color : ''}">${slot.days.Thursday ? formatScheduleEntry(slot.days.Thursday) : ''}</td>
+                    <td class="${slot.days.Friday ? slot.days.Friday.color : ''}">${slot.days.Friday ? formatScheduleEntry(slot.days.Friday) : ''}</td>
+                    <td class="${slot.days.Saturday ? slot.days.Saturday.color : ''}">${slot.days.Saturday ? formatScheduleEntry(slot.days.Saturday) : ''}</td>
+                `;
+                scheduleBody.appendChild(row);
+            });
+        }
+
+        function formatScheduleEntry(entry) {
+            return `
+                <strong>${entry.subject}</strong><br>
+                ${entry.instructor}<br>
+                ${entry.room}
+            `;
+        }
+
+        function clearSchedule() {
+            scheduleEntries = [];
+            colorIndex = 0;
+            document.getElementById('schedule-body').innerHTML = '';
+            document.getElementById('schedule-display').style.display = 'none';
+            document.getElementById('schedule-error').style.display = 'none';
+        }
+
+        function checkStudyLoad() {
+            const totalUnits = parseInt(document.getElementById('totalUnits').value) || 0;
+            const majorSubjects = parseInt(document.getElementById('majorSubjects').value) || 0;
+            const labSubjects = parseInt(document.getElementById('labSubjects').value) || 0;
+            const yearLevel = parseInt(document.getElementById('yearLevel').value);
+
+            const resultDiv = document.getElementById('load-result');
+            const statsDiv = document.getElementById('load-stats');
+            const unitsStat = document.getElementById('units-stat');
+            const hoursStat = document.getElementById('hours-stat');
+            const difficultyStat = document.getElementById('difficulty-stat');
+
+            if (totalUnits < 1 || totalUnits > 30 || majorSubjects < 0 || labSubjects < 0) {
+                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid values for units and subjects.';
+                resultDiv.style.display = 'block';
+                statsDiv.style.display = 'none';
+                return;
+            }
+
+            const lectureHours = totalUnits - labSubjects;
+            const labHours = labSubjects * 2;
+            const totalStudyHours = lectureHours + labHours;
+
+            let difficultyLevel, difficultyColor;
+            if (totalUnits > 21 || majorSubjects > 5 || labSubjects > 3) {
+                difficultyLevel = 'Heavy';
+                difficultyColor = '#ef4444';
+            } else if (totalUnits > 18 || majorSubjects > 4 || labSubjects > 2) {
+                difficultyLevel = 'Moderate';
+                difficultyColor = '#f59e0b';
+            } else {
+                difficultyLevel = 'Light';
+                difficultyColor = '#10b981';
+            }
+
+            const maxRecommendedUnits = {
+                1: 18,
+                2: 21,
+                3: 24,
+                4: 24,
+                5: 21
+            };
+            const isOverloaded = totalUnits > maxRecommendedUnits[yearLevel];
+
+            resultDiv.innerHTML = `
+                <div class="result-value">Study Load: ${difficultyLevel}</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Analysis:</strong><br>
+                    • Total Units: ${totalUnits}<br>
+                    • Major Subjects: ${majorSubjects}<br>
+                    • Laboratory Subjects: ${labSubjects}<br>
+                    • Estimated Study Hours/Week: ${totalStudyHours}<br>
+                    • Year Level: ${yearLevel}th Year<br>
+                    ${isOverloaded ? `<strong style="color: #ef4444;">Warning:</strong> Your load exceeds the recommended ${maxRecommendedUnits[yearLevel]} units for ${yearLevel}th year.` : '<strong style="color: #10b981;">Good:</strong> Your load is within recommended limits.'}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            unitsStat.textContent = totalUnits;
+            hoursStat.textContent = totalStudyHours;
+            difficultyStat.textContent = difficultyLevel;
+            difficultyStat.style.color = difficultyColor;
+            statsDiv.style.display = 'grid';
+        }
+
+        function calculateBudget() {
+            const monthlyAllowance = parseFloat(document.getElementById('monthlyAllowance').value) || 0;
+            const tuitionFees = parseFloat(document.getElementById('tuitionFees').value) || 0;
+            const transportationCost = parseFloat(document.getElementById('transportationCost').value) || 0;
+            const foodCost = parseFloat(document.getElementById('foodCost').value) || 0;
+            const booksCost = parseFloat(document.getElementById('booksCost').value) || 0;
+            const miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
+
+            const resultDiv = document.getElementById('budget-result');
+            const statsDiv = document.getElementById('budget-stats');
+            const totalIncomeDiv = document.getElementById('total-income');
+            const totalExpensesDiv = document.getElementById('total-expenses');
+            const remainingBudgetDiv = document.getElementById('remaining-budget');
+
+            const semesterIncome = monthlyAllowance * 5;
+            const semesterTransportation = transportationCost * 5;
+            const semesterFood = foodCost * 5;
+            const semesterMiscellaneous = miscellaneous * 5;
+            const totalExpenses = tuitionFees + semesterTransportation + semesterFood + booksCost + semesterMiscellaneous;
+            const remainingBudget = semesterIncome - totalExpenses;
+
+            resultDiv.innerHTML = `
+                <div class="result-value">Remaining Budget: ₱${remainingBudget.toLocaleString()}</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Financial Summary (Per Semester):</strong><br>
+                    • Income (Allowance × 5 months): ₱${semesterIncome.toLocaleString()}<br>
+                    • Tuition & Fees: ₱${tuitionFees.toLocaleString()}<br>
+                    • Transportation (₱${transportationCost}/month × 5): ₱${semesterTransportation.toLocaleString()}<br>
+                    • Food & Meals (₱${foodCost}/month × 5): ₱${semesterFood.toLocaleString()}<br>
+                    • Books & Supplies: ₱${booksCost.toLocaleString()}<br>
+                    • Miscellaneous (₱${miscellaneous}/month × 5): ₱${semesterMiscellaneous.toLocaleString()}<br>
+                    <br><strong>Total Expenses: ₱${totalExpenses.toLocaleString()}</strong><br>
+                    <strong>Remaining: ₱${remainingBudget.toLocaleString()}</strong><br>
+                    ${remainingBudget < 0 ? '<strong style="color: #ef4444;">Warning:</strong> You are overspending by ₱${Math.abs(remainingBudget).toLocaleString()}. Consider reducing expenses.' : '<strong style="color: #10b981;">Good:</strong> You have a surplus of ₱${remainingBudget.toLocaleString()} for the semester.'}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            totalIncomeDiv.textContent = `₱${semesterIncome.toLocaleString()}`;
+            totalExpensesDiv.textContent = `₱${totalExpenses.toLocaleString()}`;
+            remainingBudgetDiv.textContent = `₱${remainingBudget.toLocaleString()}`;
+            statsDiv.style.display = 'grid';
+        }
+
+        function calculateInternship() {
+            const requiredHours = parseInt(document.getElementById('requiredHours').value) || 0;
+            const startDate = new Date(document.getElementById('startDate').value);
+            const lastWorkedDate = new Date(document.getElementById('lastWorkedDate').value);
+
+            const resultDiv = document.getElementById('internship-result');
+            const statsDiv = document.getElementById('internship-stats');
+            const completionPercentageDiv = document.getElementById('completion-percentage');
+            const remainingHoursDiv = document.getElementById('remaining-hours');
+            const estimatedDaysDiv = document.getElementById('estimated-days');
+
+            if (!startDate || !lastWorkedDate || isNaN(startDate) || isNaN(lastWorkedDate) || requiredHours <= 0) {
+                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid dates and required hours.';
+                resultDiv.style.display = 'block';
+                statsDiv.style.display = 'none';
+                return;
+            }
+
+            if (lastWorkedDate < startDate) {
+                resultDiv.innerHTML = '<strong>Error:</strong> Last worked date must be after start date.';
+                resultDiv.style.display = 'block';
+                statsDiv.style.display = 'none';
+                return;
+            }
+
+            const daysWorked = Math.ceil((lastWorkedDate - startDate) / (1000 * 60 * 60 * 24));
+            const hoursPerDay = 8;
+            const totalHoursWorked = daysWorked * hoursPerDay;
+            const hoursRemaining = Math.max(0, requiredHours - totalHoursWorked);
+            const completionPercentage = ((totalHoursWorked / requiredHours) * 100).toFixed(2);
+            const estimatedDaysRemaining = Math.ceil(hoursRemaining / hoursPerDay);
+
+            resultDiv.innerHTML = `
+                <div class="result-value">Completion: ${completionPercentage}%</div>
+                <div style="margin-top: 1rem;">
+                    <strong>Internship Progress:</strong><br>
+                    • Required Hours: ${requiredHours}<br>
+                    • Days Worked: ${daysWorked}<br>
+                    • Hours Worked: ${totalHoursWorked}<br>
+                    • Hours Remaining: ${hoursRemaining}<br>
+                    • Estimated Days to Complete: ${estimatedDaysRemaining}<br>
+                    ${hoursRemaining === 0 ? '<strong style="color: #10b981;">Congratulations!</strong> You have completed your required hours.' : `<strong style="color: #f59e0b;">Keep Going:</strong> You need ${hoursRemaining} more hours to complete your internship.`}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            completionPercentageDiv.textContent = `${completionPercentage}%`;
+            remainingHoursDiv.textContent = hoursRemaining;
+            estimatedDaysDiv.textContent = estimatedDaysRemaining;
+            statsDiv.style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
