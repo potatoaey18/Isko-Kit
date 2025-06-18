@@ -711,39 +711,38 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                width: 60px;
-                padding: 2rem 0.5rem;
+                width: 280px; /* Full width when visible */
+                padding: 2rem 1.5rem;
                 transform: translateX(-100%);
                 transition: transform var(--transition);
             }
 
             .sidebar.visible {
                 transform: translateX(0);
-                width: 60px;
-                padding: 2rem 0.5rem;
             }
 
             .sidebar.minimized,
             .sidebar.expanded {
-                width: 60px;
-                padding: 2rem 0.5rem;
+                width: 280px; /* Full width on mobile when visible */
+                padding: 2rem 1.5rem;
             }
 
             .sidebar:hover:not(.hidden) {
-                width: 60px;
-                padding: 2rem 0.5rem;
+                width: 280px;
+                padding: 2rem 1.5rem;
             }
 
             .content {
                 margin-left: 0;
                 width: 100%;
                 padding: 1rem;
+                padding-top: 4rem; /* Space for toggle button */
                 padding-bottom: 5rem;
             }
 
-            .content.with-minimized-sidebar {
-                margin-left: 60px;
-                width: calc(100% - 60px);
+            .content.with-sidebar {
+                margin-left: 0;
+                width: 100%;
             }
 
             .footer {
@@ -751,30 +750,38 @@
                 margin-left: 0;
             }
 
-            .footer.with-minimized-sidebar {
-                width: calc(100% - 60px);
-                margin-left: 60px;
+            .footer.with-sidebar {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 101; /* Above sidebar */
             }
 
             .sidebar-toggle {
-                display: none;
+                display: none; /* No minimize toggle on mobile */
             }
 
             .nav-link {
-                padding: 1rem;
-                justify-content: center;
+                padding: 1rem 1.2rem;
+                justify-content: flex-start;
             }
 
             .nav-link span {
-                display: none;
+                display: inline; /* Show text when sidebar is visible */
             }
 
             .logo-section h2 {
-                display: none;
+                display: block; /* Show logo text when sidebar is visible */
             }
 
             .logo-icon {
-                margin-bottom: 0;
+                margin-bottom: 1rem;
             }
 
             .container {
@@ -1639,174 +1646,177 @@
     </footer>
 
     <script>
-    let scheduleEntries = [];
-    let colorIndex = 0;
-    let isSidebarVisible = false;
-    let isMinimized = true;
+        let scheduleEntries = [];
+        let colorIndex = 0;
+        let isSidebarVisible = false;
 
-    function toggleSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        const content = document.querySelector('.content');
-        const footer = document.querySelector('.footer');
-        const toggleBtn = document.querySelector('.toggle-btn');
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+            const toggleBtn = document.querySelector('.toggle-btn');
 
-        isSidebarVisible = !isSidebarVisible;
-        sidebar.classList.toggle('visible', isSidebarVisible);
+            isSidebarVisible = !isSidebarVisible;
+            sidebar.classList.toggle('visible', isSidebarVisible);
+            sidebar.classList.toggle('hidden', !isSidebarVisible);
 
-        if (isSidebarVisible) {
-            toggleBtn.querySelector('i').classList.replace('fa-bars', 'fa-times');
-            if (!content.classList.contains('no-sidebar')) {
+            if (isSidebarVisible) {
+                toggleBtn.querySelector('i').classList.replace('fa-bars', 'fa-times');
+                document.body.classList.add('sidebar-open');
+                if (window.innerWidth > 768) {
+                    content.classList.add('with-sidebar');
+                    footer.classList.add('with-sidebar');
+                }
+            } else {
+                toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                document.body.classList.remove('sidebar-open');
+            }
+        }
+
+        function toggleMinimize() {
+            if (window.innerWidth <= 768) return; // No minimize on mobile
+
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+            const sidebarToggle = document.querySelector('.sidebar-toggle i');
+            const isMinimized = sidebar.classList.contains('minimized');
+
+            if (!isSidebarVisible) return;
+
+            sidebar.classList.toggle('minimized', !isMinimized);
+            sidebar.classList.toggle('expanded', isMinimized);
+
+            content.classList.toggle('with-sidebar', isMinimized);
+            content.classList.toggle('with-minimized-sidebar', !isMinimized);
+            footer.classList.toggle('with-sidebar', isMinimized);
+            footer.classList.toggle('with-minimized-sidebar', !isMinimized);
+
+            sidebarToggle.classList.toggle('fa-chevron-left', isMinimized);
+            sidebarToggle.classList.toggle('fa-chevron-right', !isMinimized);
+        }
+
+        function navigateTo(section) {
+            document.querySelectorAll('.container').forEach(container => {
+                container.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById(section);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                window.scrollTo({
+                    top: targetSection.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+
+            const targetLink = document.querySelector(`a[href="#${section}"]`);
+            if (targetLink) {
+                targetLink.classList.add('active');
+            }
+
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+            if (section === 'welcome') {
+                sidebar.classList.remove('visible');
+                sidebar.classList.add('hidden');
+                isSidebarVisible = false;
+                toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                document.body.classList.remove('sidebar-open');
+            } else {
                 if (window.innerWidth <= 768) {
-                    isMinimized = true;
-                    sidebar.classList.add('minimized');
-                    sidebar.classList.remove('expanded');
-                    content.classList.add('with-minimized-sidebar');
-                    footer.classList.add('with-minimized-sidebar');
+                    // On mobile, sidebar should remain hidden until toggled
+                    sidebar.classList.remove('visible');
+                    sidebar.classList.add('hidden');
+                    isSidebarVisible = false;
+                    toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+                    content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                    footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                    document.body.classList.remove('sidebar-open');
                 } else {
-                    content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
-                    footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
+                    if (!isSidebarVisible) {
+                        toggleSidebar();
+                    }
+                    sidebar.classList.remove('hidden');
+                    content.classList.add('with-sidebar');
+                    footer.classList.add('with-sidebar');
                 }
             }
-        } else {
-            toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
-            content.classList.remove('with-sidebar', 'with-minimized-sidebar');
-            footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
-            sidebar.classList.remove('expanded');
-            isMinimized = true;
-            sidebar.classList.add('minimized');
         }
 
-        if (window.innerWidth <= 768 && isSidebarVisible) {
-            document.body.classList.add('sidebar-open');
-        } else {
-            document.body.classList.remove('sidebar-open');
-        }
-    }
-
-    function toggleMinimize() {
-        if (window.innerWidth <= 768) return;
-
-        const sidebar = document.querySelector('.sidebar');
-        const content = document.querySelector('.content');
-        const footer = document.querySelector('.footer');
-        const sidebarToggle = document.querySelector('.sidebar-toggle i');
-
-        if (!isSidebarVisible) return;
-
-        isMinimized = !isMinimized;
-        sidebar.classList.toggle('minimized', isMinimized);
-        sidebar.classList.toggle('expanded', !isMinimized);
-
-        if (!content.classList.contains('no-sidebar')) {
-            content.classList.toggle('with-sidebar', !isMinimized);
-            content.classList.toggle('with-minimized-sidebar', isMinimized);
-            footer.classList.toggle('with-sidebar', !isMinimized);
-            footer.classList.toggle('with-minimized-sidebar', isMinimized);
-        }
-
-        sidebarToggle.classList.toggle('fa-chevron-left', !isMinimized);
-        sidebarToggle.classList.toggle('fa-chevron-right', isMinimized);
-    }
-
-    function navigateTo(section) {
-        document.querySelectorAll('.container').forEach(container => {
-            container.classList.add('hidden');
-        });
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-
-        const targetSection = document.getElementById(section);
-        if (targetSection) {
-            targetSection.classList.remove('hidden');
-            window.scrollTo({
-                top: targetSection.offsetTop - 20,
-                behavior: 'smooth'
-            });
-        }
-
-        const targetLink = document.querySelector(`a[href="#${section}"]`);
-        if (targetLink) {
-            targetLink.classList.add('active');
-        }
-
-        const sidebar = document.querySelector('.sidebar');
-        const content = document.querySelector('.content');
-        const footer = document.querySelector('.footer');
-
-        if (section === 'welcome') {
-            sidebar.classList.remove('visible');
-            isSidebarVisible = false;
-            document.querySelector('.toggle-btn i').classList.replace('fa-times', 'fa-bars');
-            content.classList.remove('with-sidebar', 'with-minimized-sidebar');
-            content.classList.add('no-sidebar');
-            footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
-            document.body.classList.remove('sidebar-open');
-        } else {
-            if (!isSidebarVisible) {
+        // Hide sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && isSidebarVisible && !e.target.closest('.sidebar') && !e.target.closest('.toggle-btn')) {
                 toggleSidebar();
             }
-            content.classList.remove('no-sidebar');
-            if (window.innerWidth <= 768) {
-                isMinimized = true;
-                sidebar.classList.add('minimized');
-                sidebar.classList.remove('expanded');
-                content.classList.add('with-minimized-sidebar');
-                footer.classList.add('with-minimized-sidebar');
-            } else {
-                content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
-                footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
-            }
-        }
-    }
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const section = this.getAttribute('href').substring(1);
-            navigateTo(section);
         });
-    });
 
-    document.querySelectorAll('.feature-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const section = this.getAttribute('data-section');
-            if (section) {
+        // Existing event listeners
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('href').substring(1);
                 navigateTo(section);
-            }
-        });
-    });
-
-    document.querySelector('.toggle-btn').addEventListener('click', toggleSidebar);
-    document.querySelector('.sidebar-toggle').addEventListener('click', toggleMinimize);
-
-    const sidebar = document.querySelector('.sidebar');
-    if (window.innerWidth > 768) {
-        sidebar.addEventListener('mouseenter', () => {
-            if (isSidebarVisible && isMinimized) {
-                sidebar.classList.remove('minimized');
-                sidebar.classList.add('expanded');
-                document.querySelector('.content').classList.remove('with-minimized-sidebar');
-                document.querySelector('.content').classList.add('with-sidebar');
-                document.querySelector('.footer').classList.remove('with-minimized-sidebar');
-                document.querySelector('.footer').classList.add('with-sidebar');
-                document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-right', 'fa-chevron-left');
-            }
+            });
         });
 
-        sidebar.addEventListener('mouseleave', () => {
-            if (isSidebarVisible && isMinimized) {
-                sidebar.classList.add('minimized');
-                sidebar.classList.remove('expanded');
-                document.querySelector('.content').classList.remove('with-sidebar');
-                document.querySelector('.content').classList.add('with-minimized-sidebar');
-                document.querySelector('.footer').classList.remove('with-sidebar');
-                document.querySelector('.footer').classList.add('with-minimized-sidebar');
-                document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                if (section) {
+                    navigateTo(section);
+                }
+            });
+        });
+
+        document.querySelector('.toggle-btn').addEventListener('click', toggleSidebar);
+        document.querySelector('.sidebar-toggle').addEventListener('click', toggleMinimize);
+
+        // Remove touchmove prevention to allow scrolling
+        document.removeEventListener('touchmove', (e) => {
+            if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
+                e.preventDefault();
             }
         });
-    }
+
+        // Sidebar hover behavior for desktop
+        const sidebar = document.querySelector('.sidebar');
+        if (window.innerWidth > 768) {
+            sidebar.addEventListener('mouseenter', () => {
+                if (isSidebarVisible && sidebar.classList.contains('minimized')) {
+                    sidebar.classList.remove('minimized');
+                    sidebar.classList.add('expanded');
+                    document.querySelector('.content').classList.remove('with-minimized-sidebar');
+                    document.querySelector('.content').classList.add('with-sidebar');
+                    document.querySelector('.footer').classList.remove('with-minimized-sidebar');
+                    document.querySelector('.footer').classList.add('with-sidebar');
+                    document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
+            });
+
+            sidebar.addEventListener('mouseleave', () => {
+                if (isSidebarVisible && !sidebar.classList.contains('minimized')) {
+                    sidebar.classList.add('minimized');
+                    sidebar.classList.remove('expanded');
+                    document.querySelector('.content').classList.remove('with-sidebar');
+                    document.querySelector('.content').classList.add('with-minimized-sidebar');
+                    document.querySelector('.footer').classList.remove('with-sidebar');
+                    document.querySelector('.footer').classList.add('with-minimized-sidebar');
+                    document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+                }
+            });
+        }
 
     document.addEventListener('touchmove', (e) => {
         if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
