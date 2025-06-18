@@ -81,7 +81,7 @@
 
         .logo-section {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: .5rem;
             position: relative;
         }
 
@@ -168,7 +168,7 @@
         }
 
         .nav-link i {
-            margin-right: 0.75rem;
+            margin-right: 0;
             font-size: 1.1rem;
             color: var(--pup-gold);
             min-width: 20px;
@@ -714,16 +714,24 @@
                 width: 60px;
                 padding: 2rem 0.5rem;
                 transform: translateX(-100%);
+                transition: transform var(--transition);
             }
 
             .sidebar.visible {
-                width: 280px;
-                padding: 2rem 1.5rem;
                 transform: translateX(0);
+                width: 60px;
+                padding: 2rem 0.5rem;
             }
 
-            .sidebar.minimized {
+            .sidebar.minimized,
+            .sidebar.expanded {
                 width: 60px;
+                padding: 2rem 0.5rem;
+            }
+
+            .sidebar:hover:not(.hidden) {
+                width: 60px;
+                padding: 2rem 0.5rem;
             }
 
             .content {
@@ -736,6 +744,37 @@
             .content.with-minimized-sidebar {
                 margin-left: 60px;
                 width: calc(100% - 60px);
+            }
+
+            .footer {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .footer.with-minimized-sidebar {
+                width: calc(100% - 60px);
+                margin-left: 60px;
+            }
+
+            .sidebar-toggle {
+                display: none;
+            }
+
+            .nav-link {
+                padding: 1rem;
+                justify-content: center;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .logo-section h2 {
+                display: none;
+            }
+
+            .logo-icon {
+                margin-bottom: 0;
             }
 
             .container {
@@ -847,29 +886,30 @@
     <noscript>
         <style>
             .sidebar {
-                transform: translateX(0) !important;
+                transform: translateX(-100%) !important;
                 width: 60px;
                 padding: 2rem 0.5rem;
             }
             .content {
-                margin-left: 60px;
-                width: calc(100% - 60px);
+                margin-left: 0;
+                width: 100%;
             }
             .footer {
-                width: calc(100% - 60px);
-                margin-left: 60px;
+                width: 100%;
+                margin-left: 0;
             }
-            @media (max-width: 768px) {
+            @media (min-width: 769px) {
                 .sidebar {
-                    transform: translateX(-100%) !important;
+                    transform: translateX(0) !important;
+                    width: 60px;
                 }
                 .content {
-                    margin-left: 0;
-                    width: 100%;
+                    margin-left: 60px;
+                    width: calc(100% - 60px);
                 }
                 .footer {
-                    width: 100%;
-                    margin-left: 0;
+                    width: calc(100% - 60px);
+                    margin-left: 60px;
                 }
             }
         </style>
@@ -882,7 +922,7 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <div class="sidebar">
+    <div class="sidebar minimized">
         <div class="logo-section">
             <div class="logo-icon">
                 <i class="fas fa-graduation-cap"></i>
@@ -1597,139 +1637,152 @@
             <p>© 2025 Isko-Kit. All rights reserved.</p>
         </div>
     </footer>
-<script>
-        let scheduleEntries = [];
-        let colorIndex = 0;
-        let isSidebarVisible = false;
-        let isMinimized = true;
 
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const footer = document.querySelector('.footer');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            const sidebarToggle = document.querySelector('.sidebar-toggle i');
+    <script>
+    let scheduleEntries = [];
+    let colorIndex = 0;
+    let isSidebarVisible = false;
+    let isMinimized = true;
 
-            isSidebarVisible = !isSidebarVisible;
-            sidebar.classList.toggle('visible', isSidebarVisible);
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const footer = document.querySelector('.footer');
+        const toggleBtn = document.querySelector('.toggle-btn');
 
-            if (isSidebarVisible) {
-                toggleBtn.querySelector('i').classList.replace('fa-bars', 'fa-times');
-                if (!content.classList.contains('no-sidebar')) {
+        isSidebarVisible = !isSidebarVisible;
+        sidebar.classList.toggle('visible', isSidebarVisible);
+
+        if (isSidebarVisible) {
+            toggleBtn.querySelector('i').classList.replace('fa-bars', 'fa-times');
+            if (!content.classList.contains('no-sidebar')) {
+                if (window.innerWidth <= 768) {
+                    isMinimized = true;
+                    sidebar.classList.add('minimized');
+                    sidebar.classList.remove('expanded');
+                    content.classList.add('with-minimized-sidebar');
+                    footer.classList.add('with-minimized-sidebar');
+                } else {
                     content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
                     footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
                 }
-            } else {
-                toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
-                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
-                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
-                sidebar.classList.remove('expanded');
-                sidebarToggle.classList.replace('fa-chevron-left', 'fa-chevron-right');
+            }
+        } else {
+            toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+            footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+            sidebar.classList.remove('expanded');
+            isMinimized = true;
+            sidebar.classList.add('minimized');
+        }
+
+        if (window.innerWidth <= 768 && isSidebarVisible) {
+            document.body.classList.add('sidebar-open');
+        } else {
+            document.body.classList.remove('sidebar-open');
+        }
+    }
+
+    function toggleMinimize() {
+        if (window.innerWidth <= 768) return;
+
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const footer = document.querySelector('.footer');
+        const sidebarToggle = document.querySelector('.sidebar-toggle i');
+
+        if (!isSidebarVisible) return;
+
+        isMinimized = !isMinimized;
+        sidebar.classList.toggle('minimized', isMinimized);
+        sidebar.classList.toggle('expanded', !isMinimized);
+
+        if (!content.classList.contains('no-sidebar')) {
+            content.classList.toggle('with-sidebar', !isMinimized);
+            content.classList.toggle('with-minimized-sidebar', isMinimized);
+            footer.classList.toggle('with-sidebar', !isMinimized);
+            footer.classList.toggle('with-minimized-sidebar', isMinimized);
+        }
+
+        sidebarToggle.classList.toggle('fa-chevron-left', !isMinimized);
+        sidebarToggle.classList.toggle('fa-chevron-right', isMinimized);
+    }
+
+    function navigateTo(section) {
+        document.querySelectorAll('.container').forEach(container => {
+            container.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const targetSection = document.getElementById(section);
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+            window.scrollTo({
+                top: targetSection.offsetTop - 20,
+                behavior: 'smooth'
+            });
+        }
+
+        const targetLink = document.querySelector(`a[href="#${section}"]`);
+        if (targetLink) {
+            targetLink.classList.add('active');
+        }
+
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const footer = document.querySelector('.footer');
+
+        if (section === 'welcome') {
+            sidebar.classList.remove('visible');
+            isSidebarVisible = false;
+            document.querySelector('.toggle-btn i').classList.replace('fa-times', 'fa-bars');
+            content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+            content.classList.add('no-sidebar');
+            footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+            document.body.classList.remove('sidebar-open');
+        } else {
+            if (!isSidebarVisible) {
+                toggleSidebar();
+            }
+            content.classList.remove('no-sidebar');
+            if (window.innerWidth <= 768) {
                 isMinimized = true;
                 sidebar.classList.add('minimized');
-            }
-
-            if (window.innerWidth <= 768 && isSidebarVisible) {
-                document.body.classList.add('sidebar-open');
+                sidebar.classList.remove('expanded');
+                content.classList.add('with-minimized-sidebar');
+                footer.classList.add('with-minimized-sidebar');
             } else {
-                document.body.classList.remove('sidebar-open');
-            }
-        }
-
-        function toggleMinimize() {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const footer = document.querySelector('.footer');
-            const sidebarToggle = document.querySelector('.sidebar-toggle i');
-
-            if (!isSidebarVisible) return;
-
-            isMinimized = !isMinimized;
-            sidebar.classList.toggle('minimized', isMinimized);
-            sidebar.classList.toggle('expanded', !isMinimized);
-
-            if (!content.classList.contains('no-sidebar')) {
-                content.classList.toggle('with-sidebar', !isMinimized);
-                content.classList.toggle('with-minimized-sidebar', isMinimized);
-                footer.classList.toggle('with-sidebar', !isMinimized);
-                footer.classList.toggle('with-minimized-sidebar', isMinimized);
-            }
-
-            sidebarToggle.classList.toggle('fa-chevron-left', !isMinimized);
-            sidebarToggle.classList.toggle('fa-chevron-right', isMinimized);
-        }
-
-        function navigateTo(section) {
-            document.querySelectorAll('.container').forEach(container => {
-                container.classList.add('hidden');
-            });
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-
-            const targetSection = document.getElementById(section);
-            if (targetSection) {
-                targetSection.classList.remove('hidden');
-                window.scrollTo({
-                    top: targetSection.offsetTop - 20,
-                    behavior: 'smooth'
-                });
-            }
-
-            const targetLink = document.querySelector(`a[href="#${section}"]`);
-            if (targetLink) {
-                targetLink.classList.add('active');
-            }
-
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const footer = document.querySelector('.footer');
-
-            if (section === 'welcome') {
-                sidebar.classList.remove('visible');
-                isSidebarVisible = false;
-                document.querySelector('.toggle-btn i').classList.replace('fa-times', 'fa-bars');
-                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
-                content.classList.add('no-sidebar');
-                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
-                document.body.classList.remove('sidebar-open');
-            } else {
-                if (!isSidebarVisible) {
-                    toggleSidebar();
-                }
-                content.classList.remove('no-sidebar');
                 content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
                 footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
             }
-
-            if (window.innerWidth <= 768 && isSidebarVisible) {
-                sidebar.classList.add('minimized');
-                isMinimized = true;
-            }
         }
+    }
 
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const section = this.getAttribute('href').substring(1);
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const section = this.getAttribute('href').substring(1);
+            navigateTo(section);
+        });
+    });
+
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            if (section) {
                 navigateTo(section);
-            });
+            }
         });
+    });
 
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const section = this.getAttribute('data-section');
-                if (section) {
-                    navigateTo(section);
-                }
-            });
-        });
+    document.querySelector('.toggle-btn').addEventListener('click', toggleSidebar);
+    document.querySelector('.sidebar-toggle').addEventListener('click', toggleMinimize);
 
-        document.querySelector('.toggle-btn').addEventListener('click', toggleSidebar);
-        document.querySelector('.sidebar-toggle').addEventListener('click', toggleMinimize);
-
-        const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('.sidebar');
+    if (window.innerWidth > 768) {
         sidebar.addEventListener('mouseenter', () => {
             if (isSidebarVisible && isMinimized) {
                 sidebar.classList.remove('minimized');
@@ -1753,370 +1806,479 @@
                 document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-left', 'fa-chevron-right');
             }
         });
+    }
 
-        document.addEventListener('touchmove', (e) => {
-            if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
+    document.addEventListener('touchmove', (e) => {
+        if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-        function calculateTuition() {
-            const units = parseInt(document.getElementById('units').value) || 0;
-            const tutorialUnits = parseInt(document.getElementById('tutorialUnits').value) || 0;
-            const courseType = document.getElementById('courseType').value;
-            const isFreshmanEng = document.getElementById('isFreshmanEng').value === 'yes';
-            const discount = parseFloat(document.getElementById('discount').value) || 0;
+    function calculateTuition() {
+        const units = parseInt(document.getElementById('units').value) || 0;
+        const tutorialUnits = parseInt(document.getElementById('tutorialUnits').value) || 0;
+        const courseType = document.getElementById('courseType').value;
+        const isFreshmanEng = document.getElementById('isFreshmanEng').value === 'yes';
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
 
-            const errorDiv = document.getElementById('tuition-error');
-            const resultDiv = document.getElementById('tuition-result');
+        const errorDiv = document.getElementById('tuition-error');
+        const resultDiv = document.getElementById('tuition-result');
 
-            errorDiv.style.display = 'none';
-            resultDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        resultDiv.style.display = 'none';
 
-            if (units < 1 || units > 24) {
-                errorDiv.innerHTML = '<strong>Error:</strong> Units must be between 1 and 24.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            const tuitionCost = (units * 12) + (tutorialUnits * 40);
-            let mandatoryFees = 1697;
-            let labFees = 0;
-            switch (courseType) {
-                case 'officeAdmin': labFees = 500; break;
-                case 'engineering': labFees = 1000; break;
-                case 'computer': labFees = 750; break;
-                default: labFees = 0;
-            }
-            
-            let depositFee = isFreshmanEng ? 1000 : 0;
-            const discountAmount = tuitionCost * discount;
-            const discountedTuition = tuitionCost - discountAmount;
-            const totalFees = discountedTuition + mandatoryFees + labFees + depositFee;
-
-            resultDiv.innerHTML = `
-                <div class="result-value">Total Fees: ₱${totalFees.toLocaleString()}</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Breakdown:</strong><br>
-                    • Tuition (${units} units × ₱12): ₱${(units * 12).toLocaleString()}<br>
-                    • Tutorial (${tutorialUnits} units × ₱40): ₱${(tutorialUnits * 40).toLocaleString()}<br>
-                    • Discount Applied: -₱${discountAmount.toLocaleString()}<br>
-                    • Mandatory Fees: ₱${mandatoryFees.toLocaleString()}<br>
-                    • Laboratory Fees: ₱${labFees.toLocaleString()}<br>
-                    ${depositFee ? `• Engineering Deposit: ₱${depositFee.toLocaleString()}<br>` : ''}
-                    <br><strong>Total: ₱${totalFees.toLocaleString()}</strong>
-                </div>
-            `;
-            resultDiv.style.display = 'block';
+        if (units < 1 || units > 24) {
+            errorDiv.innerHTML = '<strong>Error:</strong> Units must be between 1 and 24.';
+            errorDiv.style.display = 'block';
+            return;
         }
 
-        function calculateGrade() {
-            const quizWeight = parseFloat(document.getElementById('quizWeight').value) || 0;
-            const quizScore = parseFloat(document.getElementById('quizScore').value) || 0;
-            const projectWeight = parseFloat(document.getElementById('projectWeight').value) || 0;
-            const projectScore = parseFloat(document.getElementById('projectScore').value) || 0;
-            const examWeight = parseFloat(document.getElementById('examWeight').value) || 0;
-            const examScore = parseFloat(document.getElementById('examScore').value) || 0;
+        const tuitionCost = (units * 12) + (tutorialUnits * 40);
+        let mandatoryFees = 1697;
+        let labFees = 0;
+        switch (courseType) {
+            case 'officeAdmin': labFees = 500; break;
+            case 'engineering': labFees = 1000; break;
+            case 'computer': labFees = 750; break;
+            default: labFees = 0;
+        }
+        
+        let depositFee = isFreshmanEng ? 1000 : 0;
+        const discountAmount = tuitionCost * discount;
+        const discountedTuition = tuitionCost - discountAmount;
+        const totalFees = discountedTuition + mandatoryFees + labFees + depositFee;
 
-            const errorDiv = document.getElementById('grade-error');
-            const resultDiv = document.getElementById('grade-result');
+        resultDiv.innerHTML = `
+            <div class="result-value">Total Fees: ₱${totalFees.toLocaleString()}</div>
+            <div style="margin-top: 1rem;">
+                <strong>Breakdown:</strong><br>
+                • Tuition (${units} units × ₱12): ₱${(units * 12).toLocaleString()}<br>
+                • Tutorial (${tutorialUnits} units × ₱40): ₱${(tutorialUnits * 40).toLocaleString()}<br>
+                • Discount Applied: -₱${discountAmount.toLocaleString()}<br>
+                • Mandatory Fees: ₱${mandatoryFees.toLocaleString()}<br>
+                • Laboratory Fees: ₱${labFees.toLocaleString()}<br>
+                ${depositFee ? `• Engineering Deposit: ₱${depositFee.toLocaleString()}<br>` : ''}
+                <br><strong>Total: ₱${totalFees.toLocaleString()}</strong>
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    }
 
-            errorDiv.style.display = 'none';
-            resultDiv.style.display = 'none';
+    function calculateGrade() {
+        const quizWeight = parseFloat(document.getElementById('quizWeight').value) || 0;
+        const quizScore = parseFloat(document.getElementById('quizScore').value) || 0;
+        const projectWeight = parseFloat(document.getElementById('projectWeight').value) || 0;
+        const projectScore = parseFloat(document.getElementById('projectScore').value) || 0;
+        const examWeight = parseFloat(document.getElementById('examWeight').value) || 0;
+        const examScore = parseFloat(document.getElementById('examScore').value) || 0;
 
-            const totalWeight = quizWeight + projectWeight + examWeight;
-            if (Math.abs(totalWeight - 100) > 0.01) {
-                errorDiv.innerHTML = `<strong>Error:</strong> Total weights must equal 100%. Current total: ${totalWeight}%`;
-                errorDiv.style.display = 'block';
-                return;
-            }
+        const errorDiv = document.getElementById('grade-error');
+        const resultDiv = document.getElementById('grade-result');
 
-            const finalGrade = (quizScore * quizWeight / 100) + (projectScore * projectWeight / 100) + (examScore * examWeight / 100);
-            
-            let letterGrade, status;
-            if (finalGrade >= 97) { letterGrade = 'A+'; status = 'Excellent'; }
-            else if (finalGrade >= 94) { letterGrade = 'A'; status = 'Very Good'; }
-            else if (finalGrade >= 90) { letterGrade = 'A-'; status = 'Very Good'; }
-            else if (finalGrade >= 85) { letterGrade = 'B+'; status = 'Good'; }
-            else if (finalGrade >= 80) { letterGrade = 'B'; status = 'Satisfactory'; }
-            else if (finalGrade >= 78) { letterGrade = 'B-'; status = 'Fair'; }
-            else if (finalGrade >= 75) { letterGrade = 'C'; status = 'Passed'; }
-            else { letterGrade = 'F'; status = 'Failed'; }
+        errorDiv.style.display = 'none';
+        resultDiv.style.display = 'none';
 
-            resultDiv.innerHTML = `
-                <div class="result-value">Final Grade: ${finalGrade.toFixed(2)}% (${letterGrade})</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Status:</strong> ${status}<br>
-                    <strong>Grade Breakdown:</strong><br>
-                    • Quiz: ${quizScore}% × ${quizWeight}% = ${(quizScore * quizWeight / 100).toFixed(2)}<br>
-                    • Project: ${projectScore}% × ${projectWeight}% = ${(projectScore * projectWeight / 100).toFixed(2)}<br>
-                    • Exam: ${examScore}% × ${examWeight}% = ${(examScore * examWeight / 100).toFixed(2)}<br>
-                    <br><strong>Final: ${finalGrade.toFixed(2)}%</strong>
-                </div>
-            `;
-            resultDiv.style.display = 'block';
+        const totalWeight = quizWeight + projectWeight + examWeight;
+        if (Math.abs(totalWeight - 100) > 0.01) {
+            errorDiv.innerHTML = `<strong>Error:</strong> Total weights must equal 100%. Current total: ${totalWeight}%`;
+            errorDiv.style.display = 'block';
+            return;
         }
 
-        function addScheduleEntry() {
-            const subjectName = document.getElementById('subjectName').value.trim();
-            const instructor = document.getElementById('instructor').value.trim();
-            const room = document.getElementById('room').value.trim();
-            const day = document.getElementById('day').value;
-            const startTime = document.getElementById('startTime').value;
-            const endTime = document.getElementById('endTime').value;
+        const finalGrade = (quizScore * quizWeight / 100) + (projectScore * projectWeight / 100) + (examScore * examWeight / 100);
+        
+        let letterGrade, status;
+        if (finalGrade >= 97) { letterGrade = 'A+'; status = 'Excellent'; }
+        else if (finalGrade >= 94) { letterGrade = 'A'; status = 'Very Good'; }
+        else if (finalGrade >= 90) { letterGrade = 'A-'; status = 'Very Good'; }
+        else if (finalGrade >= 85) { letterGrade = 'B+'; status = 'Good'; }
+        else if (finalGrade >= 80) { letterGrade = 'B'; status = 'Satisfactory'; }
+        else if (finalGrade >= 78) { letterGrade = 'B-'; status = 'Fair'; }
+        else if (finalGrade >= 75) { letterGrade = 'C'; status = 'Passed'; }
+        else { letterGrade = 'F'; status = 'Failed'; }
 
-            const errorDiv = document.getElementById('schedule-error');
+        resultDiv.innerHTML = `
+            <div class="result-value">Final Grade: ${finalGrade.toFixed(2)}% (${letterGrade})</div>
+            <div style="margin-top: 1rem;">
+                <strong>Status:</strong> ${status}<br>
+                <strong>Grade Breakdown:</strong><br>
+                • Quiz: ${quizScore}% × ${quizWeight}% = ${(quizScore * quizWeight / 100).toFixed(2)}<br>
+                • Project: ${projectScore}% × ${projectWeight}% = ${(projectScore * projectWeight / 100).toFixed(2)}<br>
+                • Exam: ${examScore}% × ${examWeight}% = ${(examScore * examWeight / 100).toFixed(2)}<br>
+                <br><strong>Final: ${finalGrade.toFixed(2)}%</strong>
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    }
 
-            errorDiv.style.display = 'none';
+    function addSubject() {
+        const subjectsContainer = document.getElementById('gwa-subjects');
+        const newSubject = document.createElement('div');
+        newSubject.className = 'form-grid subject-entry';
+        newSubject.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-book"></i> Subject Name
+                </label>
+                <input type="text" class="form-input subject-name" placeholder="e.g., Mathematics">
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-weight"></i> Units
+                </label>
+                <input type="number" class="form-input subject-units" min="1" max="5" value="3">
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-star"></i> Grade (1.0-5.0)
+                </label>
+                <input type="number" class="form-input subject-grade" min="1" max="5" step="0.25" value="1.75">
+            </div>
+        `;
+        subjectsContainer.appendChild(newSubject);
+    }
 
-            if (!subjectName || !startTime || !endTime) {
-                errorDiv.innerHTML = '<strong>Error:</strong> Please fill in subject name and times.';
+    function calculateGWA() {
+        const subjects = document.querySelectorAll('.subject-entry');
+        const errorDiv = document.getElementById('gwa-error');
+        const resultDiv = document.getElementById('gwa-result');
+
+        errorDiv.style.display = 'none';
+        resultDiv.style.display = 'none';
+
+        let totalUnits = 0;
+        let weightedSum = 0;
+
+        for (const subject of subjects) {
+            const units = parseFloat(subject.querySelector('.subject-units').value) || 0;
+            const grade = parseFloat(subject.querySelector('.subject-grade').value) || 0;
+            const name = subject.querySelector('.subject-name').value.trim();
+
+            if (!name) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all subject names.';
                 errorDiv.style.display = 'block';
                 return;
             }
 
-            if (startTime >= endTime) {
-                errorDiv.innerHTML = '<strong>Error:</strong> End time must be after start time.';
+            if (units < 1 || units > 5) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Units must be between 1 and 5.';
                 errorDiv.style.display = 'block';
                 return;
             }
 
-            const newEntry = { subjectName, instructor, room, day, startTime, endTime, color: colorIndex % 5 };
-            colorIndex++;
-            scheduleEntries.push(newEntry);
-            updateScheduleTable();
+            if (grade < 1 || grade > 5) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Grades must be between 1.0 and 5.0.';
+                errorDiv.style.display = 'block';
+                return;
+            }
 
-            document.getElementById('subjectName').value = '';
-            document.getElementById('instructor').value = '';
-            document.getElementById('room').value = '';
-            document.getElementById('startTime').value = '';
-            document.getElementById('endTime').value = '';
+            totalUnits += units;
+            weightedSum += units * grade;
         }
 
-        function updateScheduleTable() {
-            const tbody = document.getElementById('schedule-body');
-            const display = document.getElementById('schedule-display');
-            tbody.innerHTML = '';
+        if (subjects.length === 0) {
+            errorDiv.innerHTML = '<strong>Error:</strong> Please add at least one subject.';
+            errorDiv.style.display = 'block';
+            return;
+        }
 
-            if (scheduleEntries.length === 0) {
-                display.style.display = 'none';
-                return;
+        const gwa = weightedSum / totalUnits;
+
+        let status;
+        if (gwa <= 1.24) status = 'Excellent';
+        else if (gwa <= 1.74) status = 'Very Good';
+        else if (gwa <= 2.24) status = 'Good';
+        else if (gwa <= 2.74) status = 'Satisfactory';
+        else if (gwa <= 2.99) status = 'Fair';
+        else if (gwa <= 3.0) status = 'Passed';
+        else status = 'Failed';
+
+        let breakdown = '<strong>Breakdown:</strong><br>';
+        subjects.forEach((subject, index) => {
+            const name = subject.querySelector('.subject-name').value.trim();
+            const units = parseFloat(subject.querySelector('.subject-units').value);
+            const grade = parseFloat(subject.querySelector('.subject-grade').value);
+            breakdown += `• ${name}: ${units} units × ${grade.toFixed(2)} = ${(units * grade).toFixed(2)}<br>`;
+        });
+
+        resultDiv.innerHTML = `
+            <div class="result-value">GWA: ${gwa.toFixed(2)}</div>
+            <div style="margin-top: 1rem;">
+                <strong>Status:</strong> ${status}<br>
+                ${breakdown}
+                <br><strong>Total Units:</strong> ${totalUnits}<br>
+                <strong>Weighted Sum:</strong> ${weightedSum.toFixed(2)}<br>
+                <strong>GWA:</strong> ${gwa.toFixed(2)}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    }
+
+    function addScheduleEntry() {
+        const subjectName = document.getElementById('subjectName').value.trim();
+        const instructor = document.getElementById('instructor').value.trim();
+        const room = document.getElementById('room').value.trim();
+        const day = document.getElementById('day').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+
+        const errorDiv = document.getElementById('schedule-error');
+        errorDiv.style.display = 'none';
+
+        if (!subjectName || !instructor || !room || !startTime || !endTime) {
+            errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all fields.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const start = new Date(`1970-01-01T${startTime}:00`);
+        const end = new Date(`1970-01-01T${endTime}:00`);
+        if (end <= start) {
+            errorDiv.innerHTML = '<strong>Error:</strong> End time must be after start time.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const newEntry = { subjectName, instructor, room, day, startTime, endTime, color: `color-${colorIndex % 5}` };
+        scheduleEntries.push(newEntry);
+        colorIndex++;
+
+        updateScheduleTable();
+    }
+
+    function updateScheduleTable() {
+        const scheduleBody = document.getElementById('schedule-body');
+        const scheduleDisplay = document.getElementById('schedule-display');
+        scheduleBody.innerHTML = '';
+
+        if (scheduleEntries.length === 0) {
+            scheduleDisplay.style.display = 'none';
+            return;
+        }
+
+        const timeSlots = [];
+        for (let hour = 7; hour <= 20; hour++) {
+            for (let minute = 0; minute < 60; minute += 30) {
+                const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                timeSlots.push(time);
             }
+        }
 
-            display.style.display = 'block';
+        timeSlots.forEach(time => {
+            const row = document.createElement('tr');
+            const timeCell = document.createElement('td');
+            timeCell.textContent = time;
+            row.appendChild(timeCell);
 
-            const timeSlots = generateTimeSlots();
-            timeSlots.forEach(slot => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${slot}</td><td></td><td></td><td></td><td></td><td></td><td></td>`;
-                scheduleEntries.forEach(entry => {
-                    if (isTimeInSlot(slot, entry.startTime, entry.endTime)) {
-                        const dayIndex = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(entry.day) + 1;
-                        row.cells[dayIndex].innerHTML = `
-                            <div class="color-${entry.color}">
-                                <strong>${entry.subjectName}</strong><br>
-                                ${entry.instructor ? `Prof. ${entry.instructor}<br>` : ''}
-                                ${entry.room ? `Room ${entry.room}<br>` : ''}
-                                ${entry.startTime} - ${entry.endTime}
-                            </div>
-                        `;
-                        row.cells[dayIndex].setAttribute('data-day', entry.day);
-                    }
-                });
-                tbody.appendChild(row);
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            days.forEach(day => {
+                const cell = document.createElement('td');
+                cell.setAttribute('data-day', day);
+                const entry = scheduleEntries.find(e => e.day === day && isTimeInSlot(e, time));
+                if (entry) {
+                    cell.classList.add(entry.color);
+                    cell.innerHTML = `
+                        <strong>${entry.subjectName}</strong><br>
+                        ${entry.instructor}<br>
+                        ${entry.room}<br>
+                        ${entry.startTime} - ${entry.endTime}
+                    `;
+                }
+                row.appendChild(cell);
             });
-        }
 
-        function generateTimeSlots() {
-            const slots = [];
-            for (let hour = 7; hour <= 20; hour++) {
-                slots.push(`${hour}:00 - ${hour + 1}:00`);
-            }
-            return slots;
-        }
+            scheduleBody.appendChild(row);
+        });
 
-        function isTimeInSlot(slot, startTime, endTime) {
-            const [slotStart, slotEnd] = slot.split(' - ').map(t => parseInt(t.split(':')[0]));
-            const startHour = parseInt(startTime.split(':')[0]);
-            const endHour = parseInt(endTime.split(':')[0]);
-            return startHour <= slotEnd && endHour >= slotStart;
-        }
+        scheduleDisplay.style.display = 'block';
+    }
 
-        function clearSchedule() {
-            scheduleEntries = [];
-            colorIndex = 0;
-            updateScheduleTable();
-        }
+    function isTimeInSlot(entry, slotTime) {
+        const slot = new Date(`1970-01-01T${slotTime}:00`);
+        const start = new Date(`1970-01-01T${entry.startTime}:00`);
+        const end = new Date(`1970-01-01T${entry.endTime}:00`);
+        return slot >= start && slot < end;
+    }
 
-        function checkStudyLoad() {
-            const totalUnits = parseInt(document.getElementById('totalUnits').value) || 0;
-            const majorSubjects = parseInt(document.getElementById('majorSubjects').value) || 0;
-            const labSubjects = parseInt(document.getElementById('labSubjects').value) || 0;
-            const yearLevel = parseInt(document.getElementById('yearLevel').value) || 1;
+    function clearSchedule() {
+        scheduleEntries = [];
+        colorIndex = 0;
+        updateScheduleTable();
+    }
 
-            const resultDiv = document.getElementById('load-result');
-            const statsDiv = document.getElementById('load-stats');
-            const unitsStat = document.getElementById('units-stat');
-            const hoursStat = document.getElementById('hours-stat');
-            const difficultyStat = document.getElementById('difficulty-stat');
+    function checkStudyLoad() {
+        const totalUnits = parseInt(document.getElementById('totalUnits').value) || 0;
+        const majorSubjects = parseInt(document.getElementById('majorSubjects').value) || 0;
+        const labSubjects = parseInt(document.getElementById('labSubjects').value) || 0;
+        const yearLevel = parseInt(document.getElementById('yearLevel').value) || 1;
 
-            resultDiv.style.display = 'none';
-            statsDiv.style.display = 'none';
+        const resultDiv = document.getElementById('load-result');
+        const statsDiv = document.getElementById('load-stats');
+        const unitsStat = document.getElementById('units-stat');
+        const hoursStat = document.getElementById('hours-stat');
+        const difficultyStat = document.getElementById('difficulty-stat');
 
-            if (totalUnits < 1 || totalUnits > 30) {
-                resultDiv.innerHTML = '<strong>Error:</strong> Total units must be between 1 and 30.';
-                resultDiv.style.display = 'block';
-                return;
-            }
+        resultDiv.style.display = 'none';
+        statsDiv.style.display = 'none';
 
-            const studyHours = totalUnits * 2 + labSubjects * 2 + majorSubjects * 1;
-            let status, recommendation;
-            if (totalUnits <= 15) {
-                status = 'Light';
-                recommendation = 'You have a manageable load. Consider adding extracurricular activities.';
-            } else if (totalUnits <= 21) {
-                status = 'Balanced';
-                recommendation = 'Your load is balanced. Maintain a consistent study schedule.';
-            } else {
-                status = 'Heavy';
-                recommendation = 'Your load is heavy. Prioritize time management and seek support if needed.';
-            }
-
-            if (yearLevel <= 2 && totalUnits > 24) {
-                recommendation += ' First or second-year students should avoid overloading.';
-            }
-
-            resultDiv.innerHTML = `
-                <div class="result-value">Study Load Status: ${status}</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Details:</strong><br>
-                    • Total Units: ${totalUnits}<br>
-                    • Major Subjects: ${majorSubjects}<br>
-                    • Laboratory Subjects: ${labSubjects}<br>
-                    • Estimated Study Hours/Week: ${studyHours}<br>
-                    <br><strong>Recommendation:</strong> ${recommendation}
-                </div>
-            `;
+        if (totalUnits < 1 || totalUnits > 30) {
+            resultDiv.innerHTML = '<strong>Error:</strong> Total units must be between 1 and 30.';
             resultDiv.style.display = 'block';
-
-            unitsStat.textContent = totalUnits;
-            hoursStat.textContent = studyHours;
-            difficultyStat.textContent = status;
-            statsDiv.style.display = 'grid';
+            return;
         }
 
-        function calculateBudget() {
-            const monthlyAllowance = parseFloat(document.getElementById('monthlyAllowance').value) || 0;
-            const tuitionFees = parseFloat(document.getElementById('tuitionFees').value) || 0;
-            const transportationCost = parseFloat(document.getElementById('transportationCost').value) || 0;
-            const foodCost = parseFloat(document.getElementById('foodCost').value) || 0;
-            const booksCost = parseFloat(document.getElementById('booksCost').value) || 0;
-            const miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
+        const estimatedHours = totalUnits * 2 + labSubjects * 3 + majorSubjects * 1.5;
+        let status, recommendation;
+        if (totalUnits <= 15) {
+            status = 'Light';
+            recommendation = 'You have a manageable load. Consider adding extracurricular activities.';
+        } else if (totalUnits <= 21) {
+            status = 'Moderate';
+            recommendation = 'Balanced load. Ensure you allocate time for both study and rest.';
+        } else if (totalUnits <= 24) {
+            status = 'Heavy';
+            recommendation = 'Challenging load. Prioritize time management and seek support if needed.';
+        } else {
+            status = 'Overload';
+            recommendation = 'Exceeds recommended units. Consult with your adviser.';
+        }
 
-            const resultDiv = document.getElementById('budget-result');
-            const statsDiv = document.getElementById('budget-stats');
-            const totalIncomeEl = document.getElementById('total-income');
-            const totalExpensesEl = document.getElementById('total-expenses');
-            const remainingBudgetEl = document.getElementById('remaining-budget');
+        if (yearLevel <= 2 && totalUnits > 21) {
+            recommendation += ' As a lower-year student, consider reducing units for better adjustment.';
+        }
 
-            resultDiv.style.display = 'none';
-            statsDiv.style.display = 'none';
+        resultDiv.innerHTML = `
+            <div class="result-value">Study Load Status: ${status}</div>
+            <div style="margin-top: 1rem;">
+                <strong>Analysis:</strong><br>
+                • Total Units: ${totalUnits}<br>
+                • Major Subjects: ${majorSubjects}<br>
+                • Laboratory Subjects: ${labSubjects}<br>
+                • Estimated Study Hours/Week: ${estimatedHours.toFixed(1)}<br>
+                <br><strong>Recommendation:</strong><br>
+                ${recommendation}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
 
-            const semesterMonths = 5;
-            const totalIncome = monthlyAllowance * semesterMonths;
-            const monthlyExpenses = transportationCost + foodCost + miscellaneous;
-            const totalExpenses = (monthlyExpenses * semesterMonths) + tuitionFees + booksCost;
-            const remainingBudget = totalIncome - totalExpenses;
+        unitsStat.textContent = totalUnits;
+        hoursStat.textContent = estimatedHours.toFixed(1);
+        difficultyStat.textContent = status;
+        statsDiv.style.display = 'grid';
+    }
 
-            let status, advice;
-            if (remainingBudget >= 0) {
-                status = 'Surplus';
-                advice = 'You have enough budget. Consider saving the surplus for emergencies.';
-            } else {
-                status = 'Deficit';
-                advice = 'Your expenses exceed your budget. Review and reduce non-essential costs.';
-            }
+    function calculateBudget() {
+        const monthlyAllowance = parseFloat(document.getElementById('monthlyAllowance').value) || 0;
+        const tuitionFees = parseFloat(document.getElementById('tuitionFees').value) || 0;
+        const transportationCost = parseFloat(document.getElementById('transportationCost').value) || 0;
+        const foodCost = parseFloat(document.getElementById('foodCost').value) || 0;
+        const booksCost = parseFloat(document.getElementById('booksCost').value) || 0;
+        const miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
 
-            resultDiv.innerHTML = `
-                <div class="result-value">${status}: ₱${Math.abs(remainingBudget).toLocaleString()}</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Breakdown:</strong><br>
-                    • Semester Income (${monthlyAllowance} × ${semesterMonths}): ₱${totalIncome.toLocaleString()}<br>
-                    • Tuition & Fees: ₱${tuitionFees.toLocaleString()}<br>
-                    • Transportation (${transportationCost} × ${semesterMonths}): ₱${(transportationCost * semesterMonths).toLocaleString()}<br>
-                    • Food & Meals (${foodCost} × ${semesterMonths}): ₱${(foodCost * semesterMonths).toLocaleString()}<br>
-                    • Books & Supplies: ₱${booksCost.toLocaleString()}<br>
-                    • Miscellaneous (${miscellaneous} × ${semesterMonths}): ₱${(miscellaneous * semesterMonths).toLocaleString()}<br>
-                    <br><strong>Total Expenses:</strong> ₱${totalExpenses.toLocaleString()}<br>
-                    <strong>Remaining Budget:</strong> ₱${remainingBudget.toLocaleString()}<br>
-                    <br><strong>Advice:</strong> ${advice}
-                </div>
-            `;
+        const resultDiv = document.getElementById('budget-result');
+        const statsDiv = document.getElementById('budget-stats');
+        const totalIncomeStat = document.getElementById('total-income');
+        const totalExpensesStat = document.getElementById('total-expenses');
+        const remainingBudgetStat = document.getElementById('remaining-budget');
+
+        resultDiv.style.display = 'none';
+        statsDiv.style.display = 'none';
+
+        const semesterMonths = 5;
+        const totalIncome = monthlyAllowance * semesterMonths;
+        const totalExpenses = tuitionFees + (transportationCost * semesterMonths) + (foodCost * semesterMonths) + booksCost + (miscellaneous * semesterMonths);
+        const remainingBudget = totalIncome - totalExpenses;
+
+        let status, recommendation;
+        if (remainingBudget >= 0) {
+            status = 'Surplus';
+            recommendation = 'You have a positive balance. Consider saving or investing the surplus.';
+        } else {
+            status = 'Deficit';
+            recommendation = 'Your expenses exceed your income. Adjust your budget or find additional income sources.';
+        }
+
+        resultDiv.innerHTML = `
+            <div class="result-value">Budget Status: ${status}</div>
+            <div style="margin-top: 1rem;">
+                <strong>Breakdown:</strong><br>
+                • Semester Income (${monthlyAllowance.toLocaleString()} × ${semesterMonths}): ₱${totalIncome.toLocaleString()}<br>
+                • Tuition & Fees: ₱${tuitionFees.toLocaleString()}<br>
+                • Transportation (${transportationCost.toLocaleString()} × ${semesterMonths}): ₱${(transportationCost * semesterMonths).toLocaleString()}<br>
+                • Food & Meals (${foodCost.toLocaleString()} × ${semesterMonths}): ₱${(foodCost * semesterMonths).toLocaleString()}<br>
+                • Books & Supplies: ₱${booksCost.toLocaleString()}<br>
+                • Miscellaneous (${miscellaneous.toLocaleString()} × ${semesterMonths}): ₱${(miscellaneous * semesterMonths).toLocaleString()}<br>
+                <br><strong>Total Expenses:</strong> ₱${totalExpenses.toLocaleString()}<br>
+                <strong>Remaining Budget:</strong> ₱${remainingBudget.toLocaleString()}<br>
+                <br><strong>Recommendation:</strong><br>
+                ${recommendation}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+
+        totalIncomeStat.textContent = `₱${totalIncome.toLocaleString()}`;
+        totalExpensesStat.textContent = `₱${totalExpenses.toLocaleString()}`;
+        remainingBudgetStat.textContent = `₱${remainingBudget.toLocaleString()}`;
+        statsDiv.style.display = 'grid';
+    }
+
+    function calculateInternship() {
+        const requiredHours = parseInt(document.getElementById('requiredHours').value) || 0;
+        const startDate = new Date(document.getElementById('startDate').value);
+        const lastWorkedDate = new Date(document.getElementById('lastWorkedDate').value);
+
+        const resultDiv = document.getElementById('internship-result');
+        const statsDiv = document.getElementById('internship-stats');
+        const completionPercentage = document.getElementById('completion-percentage');
+        const remainingHours = document.getElementById('remaining-hours');
+        const estimatedDays = document.getElementById('estimated-days');
+
+        resultDiv.style.display = 'none';
+        statsDiv.style.display = 'none';
+
+        if (isNaN(startDate) || isNaN(lastWorkedDate)) {
+            resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid dates.';
             resultDiv.style.display = 'block';
-
-            totalIncomeEl.textContent = `₱${totalIncome.toLocaleString()}`;
-            totalExpensesEl.textContent = `₱${totalExpenses.toLocaleString()}`;
-            remainingBudgetEl.textContent = `₱${remainingBudget.toLocaleString()}`;
-            statsDiv.style.display = 'grid';
+            return;
         }
 
-        function calculateInternship() {
-            const requiredHours = parseInt(document.getElementById('requiredHours').value) || 0;
-            const startDate = new Date(document.getElementById('startDate').value);
-            const lastWorkedDate = new Date(document.getElementById('lastWorkedDate').value);
-
-            const resultDiv = document.getElementById('internship-result');
-            const statsDiv = document.getElementById('internship-stats');
-            const completionPercentageEl = document.getElementById('completion-percentage');
-            const remainingHoursEl = document.getElementById('remaining-hours');
-            const estimatedDaysEl = document.getElementById('estimated-days');
-
-            resultDiv.style.display = 'none';
-            statsDiv.style.display = 'none';
-
-            if (!startDate || !lastWorkedDate || lastWorkedDate < startDate) {
-                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid dates, with last worked date after start date.';
-                resultDiv.style.display = 'block';
-                return;
-            }
-
-            const workDays = Math.ceil((lastWorkedDate - startDate) / (1000 * 60 * 60 * 24));
-            const hoursPerDay = 8;
-            const completedHours = workDays * hoursPerDay;
-            const remainingHours = requiredHours - completedHours;
-            const completionPercentage = (completedHours / requiredHours) * 100;
-            const estimatedDaysLeft = remainingHours > 0 ? Math.ceil(remainingHours / hoursPerDay) : 0;
-
-            let status;
-            if (completionPercentage >= 100) {
-                status = 'Completed';
-            } else if (completionPercentage >= 75) {
-                status = 'Nearing Completion';
-            } else if (completionPercentage >= 50) {
-                status = 'Halfway';
-            } else {
-                status = 'In Progress';
-            }
-
-            resultDiv.innerHTML = `
-                <div class="result-value">Progress: ${completionPercentage.toFixed(2)}%</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Details:</strong><br>
-                    • Required Hours: ${requiredHours}<br>
-                    • Completed Hours: ${completedHours}<br>
-                    • Remaining Hours: ${remainingHours}<br>
-                    • Work Days So Far: ${workDays}<br>
-                    • Estimated Days Left: ${estimatedDaysLeft}<br>
-                    <br><strong>Status:</strong> ${status}
-                </div>
-            `;
+        if (lastWorkedDate < startDate) {
+            resultDiv.innerHTML = '<strong>Error:</strong> Last worked date must be after start date.';
             resultDiv.style.display = 'block';
-
-            completionPercentageEl.textContent = `${completionPercentage.toFixed(2)}%`;
-            remainingHoursEl.textContent = remainingHours;
-            estimatedDaysEl.textContent = estimatedDaysLeft;
-            statsDiv.style.display = 'grid';
+            return;
         }
+
+        if (requiredHours < 1) {
+            resultDiv.innerHTML = '<strong>Error:</strong> Required hours must be at least 1.';
+            resultDiv.style.display = 'block';
+            return;
+        }
+
+        const workDays = Math.ceil((lastWorkedDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const hoursPerDay = 8;
+        const completedHours = Math.min(workDays * hoursPerDay, requiredHours);
+        const percentage = (completedHours / requiredHours) * 100;
+        const hoursLeft = requiredHours - completedHours;
+        const daysToComplete = hoursLeft > 0 ? Math.ceil(hoursLeft / hoursPerDay) : 0;
+
+        resultDiv.innerHTML = `
+            <div class="result-value">Completion: ${percentage.toFixed(1)}%</div>
+            <div style="margin-top: 1rem;">
+                <strong>Details:</strong><br>
+                • Required Hours: ${requiredHours}<br>
+                • Completed Hours: ${completedHours}<br>
+                • Remaining Hours: ${hoursLeft}<br>
+                • Work Days So Far: ${workDays}<br>
+                • Estimated Days to Complete: ${daysToComplete}<br>
+                <br><strong>Progress:</strong><br>
+                You are ${percentage.toFixed(1)}% done with your internship requirements.
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+
+        completionPercentage.textContent = `${percentage.toFixed(1)}%`;
+        remainingHours.textContent = hoursLeft;
+        estimatedDays.textContent = daysToComplete;
+        statsDiv.style.display = 'grid';
+    }
 </script>
-</body>
-</html>
