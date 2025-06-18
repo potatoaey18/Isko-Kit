@@ -33,11 +33,10 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-gradient);
             color: #1e293b;
-            min-height: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             line-height: 1.6;
-            margin: 0;
         }
 
         .sidebar {
@@ -49,10 +48,24 @@
             box-shadow: var(--card-shadow);
             backdrop-filter: blur(10px);
             z-index: 100;
-            overflow-y: auto;
+            overflow: hidden;
             -webkit-overflow-scrolling: touch;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform var(--transition), width var(--transition);
+            transform: translateX(-100%);
+        }
+
+        .sidebar.visible {
             transform: translateX(0);
+        }
+
+        .sidebar.minimized {
+            width: 60px;
+            padding: 2rem 0.5rem;
+        }
+
+        .sidebar:hover:not(.hidden), .sidebar.expanded {
+            width: 280px;
+            padding: 2rem 1.5rem;
         }
 
         .sidebar::before {
@@ -72,9 +85,14 @@
             position: relative;
         }
 
+        .sidebar.minimized .logo-section h2,
+        .sidebar:not(.expanded):not(:hover) .logo-section h2 {
+            display: none;
+        }
+
         .logo-icon {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             background: var(--gold-gradient);
             border-radius: 50%;
             display: flex;
@@ -85,13 +103,18 @@
             animation: pulse 2s infinite;
         }
 
+        .sidebar.minimized .logo-icon,
+        .sidebar:not(.expanded):not(:hover) .logo-icon {
+            margin-bottom: 0;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
 
         .logo-icon i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--pup-maroon);
         }
 
@@ -123,6 +146,12 @@
             overflow: hidden;
         }
 
+        .sidebar.minimized .nav-link,
+        .sidebar:not(.expanded):not(:hover) .nav-link {
+            padding: 1rem;
+            justify-content: center;
+        }
+
         .nav-link::before {
             content: '';
             position: absolute;
@@ -145,6 +174,16 @@
             min-width: 20px;
         }
 
+        .sidebar.minimized .nav-link i,
+        .sidebar:not(.expanded):not(:hover) .nav-link i {
+            margin-right: 0;
+        }
+
+        .sidebar.minimized .nav-link span,
+        .sidebar:not(.expanded):not(:hover) .nav-link span {
+            display: none;
+        }
+
         .nav-link:hover,
         .nav-link.active {
             background: rgba(255, 255, 255, 0.15);
@@ -153,37 +192,72 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .content {
-            margin-left: 300px;
-            padding: 2rem;
-            width: calc(100% - 300px);
-            flex: 1 0 auto; /* Grow to fill available space */
-            transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .sidebar.minimized .nav-link:hover,
+        .sidebar.minimized .nav-link.active,
+        .sidebar:not(.expanded):not(:hover) .nav-link:hover,
+        .sidebar:not(.expanded):not(:hover) .nav-link.active {
+            transform: translateX(0);
         }
 
-        .hamburger {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 110;
+        .toggle-btn {
             background: var(--pup-maroon);
             color: white;
             border: none;
-            padding: 0.75rem;
-            border-radius: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 1.5rem;
             transition: var(--transition);
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 99;
         }
 
-        .hamburger:hover {
+        .toggle-btn:hover {
             background: var(--pup-dark-maroon);
         }
 
-        .hamburger:focus {
-            outline: 2px solid var(--pup-gold);
-            outline-offset: 2px;
+        .sidebar-toggle {
+            position: absolute;
+            top: 1rem;
+            right: -20px;
+            background: var(--pup-maroon);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--pup-dark-maroon);
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 2rem;
+            width: 100%;
+            flex: 1 0 auto;
+            transition: var(--transition);
+        }
+
+        .content.with-sidebar {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+        }
+
+        .content.with-minimized-sidebar {
+            margin-left: 60px;
+            width: calc(100% - 60px);
         }
 
         .container {
@@ -568,19 +642,38 @@
             font-size: 0.9rem;
             line-height: 1.5;
         }
+
         .footer {
             background: var(--primary-gradient);
             color: white;
-            padding:1rem;
-            flex-shrink: 0;
+            padding: 1rem;
+            bottom: 0;
+            width: 100%;
             box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .footer.with-sidebar {
+            width: calc(100% - 280px);
+            margin-left: 280px;
+        }
+
+        .footer.with-minimized-sidebar {
+            width: calc(100% - 60px);
+            margin-left: 60px;
         }
 
         .footer-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-section {
+            padding: 0.5rem;
         }
 
         .footer-section h3 {
@@ -589,77 +682,60 @@
             color: var(--pup-gold);
         }
 
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--pup-gold);
+        }
+
         .footer-bottom {
             text-align: center;
             font-size: 0.85rem;
             opacity: 0.8;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        @media (max-width: 768px) {
-            .footer {
-                padding: 2rem 1rem 1rem;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .footer-links a:hover {
-                transform: none;
-            }
-        }
-
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
-                width: 280px;
-                position: fixed;
-                top: 0;
-                left: 0;
+                width: 60px;
+                padding: 2rem 0.5rem;
                 transform: translateX(-100%);
-                z-index: 100;
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
             }
 
-            .sidebar.active {
+            .sidebar.visible {
+                width: 280px;
+                padding: 2rem 1.5rem;
                 transform: translateX(0);
+            }
+
+            .sidebar.minimized {
+                width: 60px;
             }
 
             .content {
                 margin-left: 0;
                 width: 100%;
                 padding: 1rem;
-                padding-top: 4rem;
-                transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding-bottom: 5rem;
             }
 
-            .hamburger {
-                display: block;
-            }
-
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 99;
-                opacity: 0;
-                transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            .overlay.active {
-                display: block;
-                opacity: 1;
-            }
-
-            body.sidebar-open {
-                overflow: hidden;
+            .content.with-minimized-sidebar {
+                margin-left: 60px;
+                width: calc(100% - 60px);
             }
 
             .container {
@@ -668,6 +744,65 @@
 
             .page-title {
                 font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-input,
+            .form-select {
+                font-size: 0.95rem;
+                padding: 0.75rem;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+
+            .schedule-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                font-size: 0.85rem;
+            }
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 0.5rem;
+                min-width: 100px;
+            }
+
+            .schedule-table thead {
+                display: none;
+            }
+
+            .schedule-table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .schedule-table tbody td {
+                display: block;
+                text-align: left;
+                padding: 0.5rem 1rem;
+                position: relative;
+            }
+
+            .schedule-table tbody td:before {
+                content: attr(data-day);
+                font-weight: 600;
+                color: var(--pup-maroon);
+                display: block;
+                margin-bottom: 0.25rem;
+            }
+
+            .schedule-table tbody td:first-child:before {
+                content: "Time";
             }
         }
 
@@ -693,6 +828,18 @@
                 padding: 0.75rem 1.5rem;
                 font-size: 1rem;
             }
+
+            .schedule-table {
+                font-size: 0.8rem;
+            }
+
+            .schedule-table td {
+                min-width: 80px;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -701,15 +848,27 @@
         <style>
             .sidebar {
                 transform: translateX(0) !important;
-            }
-            .hamburger {
-                display: none;
+                width: 60px;
+                padding: 2rem 0.5rem;
             }
             .content {
-                margin-left: 280px;
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+            .footer {
+                width: calc(100% - 60px);
+                margin-left: 60px;
             }
             @media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%) !important;
+                }
                 .content {
+                    margin-left: 0;
+                    width: 100%;
+                }
+                .footer {
+                    width: 100%;
                     margin-left: 0;
                 }
             }
@@ -719,10 +878,10 @@
         </div>
     </noscript>
     
-    <button class="hamburger">
+    <button class="toggle-btn" title="Toggle Sidebar">
         <i class="fas fa-bars"></i>
     </button>
-    <div class="overlay"></div>
+
     <div class="sidebar">
         <div class="logo-section">
             <div class="logo-icon">
@@ -730,50 +889,53 @@
             </div>
             <h2>Isko-Kit</h2>
         </div>
+        <button class="sidebar-toggle">
+            <i class="fas fa-chevron-right"></i>
+        </button>
         <ul class="sidebar-nav">
             <li class="nav-item">
                 <a href="#welcome" class="nav-link active">
-                    <i class="fas fa-home"></i> Welcome
+                    <i class="fas fa-home"></i> <span>Welcome</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#tuition" class="nav-link">
-                    <i class="fas fa-calculator"></i> Tuition & Fees
+                    <i class="fas fa-calculator"></i> <span>Tuition & Fees</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#grade" class="nav-link">
-                    <i class="fas fa-pencil-alt"></i> Grade Calculator
+                    <i class="fas fa-pencil-alt"></i> <span>Grade Calculator</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#gpa" class="nav-link">
-                    <i class="fas fa-graduation-cap"></i> GWA Calculator
+                    <i class="fas fa-graduation-cap"></i> <span>GWA Calculator</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#schedule" class="nav-link">
-                    <i class="fas fa-calendar"></i> Schedule Maker
+                    <i class="fas fa-calendar"></i> <span>Schedule Maker</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#load" class="nav-link">
-                    <i class="fas fa-book"></i> Study Load Checker
+                    <i class="fas fa-book"></i> <span>Study Load Checker</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#budget" class="nav-link">
-                    <i class="fas fa-wallet"></i> Budget Tracker
+                    <i class="fas fa-wallet"></i> <span>Budget Tracker</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#internship" class="nav-link">
-                    <i class="fas fa-briefcase"></i> Internship Tracker
+                    <i class="fas fa-briefcase"></i> <span>Internship Tracker</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#enrollment" class="nav-link">
-                    <i class="fas fa-check-square"></i> Enrollment Guide
+                    <i class="fas fa-check-square"></i> <span>Enrollment Guide</span>
                 </a>
             </li>
         </ul>
@@ -795,7 +957,7 @@
                     <div class="feature-icon">
                         <i class="fas fa-calculator"></i>
                     </div>
-                    <div class="feature-title">Tuition Calculator</div>
+                    <div class="feature-title">Tuition & Fees Calculator</div>
                     <div class="feature-description">Estimate your tuition fees and plan your finances with our comprehensive calculator.</div>
                 </div>
                 <div class="feature-card" data-section="grade">
@@ -819,6 +981,13 @@
                     <div class="feature-title">Schedule Maker</div>
                     <div class="feature-description">Create and visualize your class schedule with our interactive planner.</div>
                 </div>
+                <div class="feature-card" data-section="load">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="feature-title">Study Load Checker</div>
+                    <div class="feature-description">Monitor your academic workload to ensure a balanced semester.</div>
+                </div>
                 <div class="feature-card" data-section="budget">
                     <div class="feature-icon">
                         <i class="fas fa-wallet"></i>
@@ -832,6 +1001,13 @@
                     </div>
                     <div class="feature-title">Internship Tracker</div>
                     <div class="feature-description">Log and monitor your internship hours to meet graduation requirements.</div>
+                </div>
+                <div class="feature-card" data-section="enrollment">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-square"></i>
+                    </div>
+                    <div class="feature-title">Enrollment Guide</div>
+                    <div class="feature-description">Step-by-step assistance for a smooth enrollment process.</div>
                 </div>
             </div>
         </div>
@@ -1047,7 +1223,7 @@
         <div id="schedule" class="container hidden">
             <div class="page-header">
                 <h1 class="page-title">Schedule Maker</h1>
-                <p class="page-subtitle">Create your weekly class schedule.  Just take a Screenshot when done!</p>
+                <p class="page-subtitle">Create your weekly class schedule. Just take a Screenshot when done!</p>
             </div>
             
             <div class="form-grid">
@@ -1415,29 +1591,72 @@
             </div>
         </div>
     </div>
+
     <footer class="footer">
         <div class="footer-bottom">
-            <p>&copy; 2025 Isko-Kit. All rights reserved.</p>
+            <p>© 2025 Isko-Kit. All rights reserved.</p>
         </div>
     </footer>
-    <script>
+<script>
         let scheduleEntries = [];
         let colorIndex = 0;
+        let isSidebarVisible = false;
+        let isMinimized = true;
 
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.overlay');
-            const body = document.body;
-            const hamburgerIcon = document.querySelector('.hamburger i');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            const sidebarToggle = document.querySelector('.sidebar-toggle i');
 
-            const isActive = sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            body.classList.toggle('sidebar-open');
+            isSidebarVisible = !isSidebarVisible;
+            sidebar.classList.toggle('visible', isSidebarVisible);
 
-            sidebar.style.transform = isActive ? 'translateX(0)' : 'translateX(-100%)';
+            if (isSidebarVisible) {
+                toggleBtn.querySelector('i').classList.replace('fa-bars', 'fa-times');
+                if (!content.classList.contains('no-sidebar')) {
+                    content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
+                    footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
+                }
+            } else {
+                toggleBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                sidebar.classList.remove('expanded');
+                sidebarToggle.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                isMinimized = true;
+                sidebar.classList.add('minimized');
+            }
 
-            hamburgerIcon.classList.toggle('fa-bars', !isActive);
-            hamburgerIcon.classList.toggle('fa-times', isActive);
+            if (window.innerWidth <= 768 && isSidebarVisible) {
+                document.body.classList.add('sidebar-open');
+            } else {
+                document.body.classList.remove('sidebar-open');
+            }
+        }
+
+        function toggleMinimize() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+            const sidebarToggle = document.querySelector('.sidebar-toggle i');
+
+            if (!isSidebarVisible) return;
+
+            isMinimized = !isMinimized;
+            sidebar.classList.toggle('minimized', isMinimized);
+            sidebar.classList.toggle('expanded', !isMinimized);
+
+            if (!content.classList.contains('no-sidebar')) {
+                content.classList.toggle('with-sidebar', !isMinimized);
+                content.classList.toggle('with-minimized-sidebar', isMinimized);
+                footer.classList.toggle('with-sidebar', !isMinimized);
+                footer.classList.toggle('with-minimized-sidebar', isMinimized);
+            }
+
+            sidebarToggle.classList.toggle('fa-chevron-left', !isMinimized);
+            sidebarToggle.classList.toggle('fa-chevron-right', isMinimized);
         }
 
         function navigateTo(section) {
@@ -1463,8 +1682,30 @@
                 targetLink.classList.add('active');
             }
 
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const footer = document.querySelector('.footer');
+
+            if (section === 'welcome') {
+                sidebar.classList.remove('visible');
+                isSidebarVisible = false;
+                document.querySelector('.toggle-btn i').classList.replace('fa-times', 'fa-bars');
+                content.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                content.classList.add('no-sidebar');
+                footer.classList.remove('with-sidebar', 'with-minimized-sidebar');
+                document.body.classList.remove('sidebar-open');
+            } else {
+                if (!isSidebarVisible) {
+                    toggleSidebar();
+                }
+                content.classList.remove('no-sidebar');
+                content.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
+                footer.classList.add(isMinimized ? 'with-minimized-sidebar' : 'with-sidebar');
+            }
+
+            if (window.innerWidth <= 768 && isSidebarVisible) {
+                sidebar.classList.add('minimized');
+                isMinimized = true;
             }
         }
 
@@ -1485,12 +1726,33 @@
             });
         });
 
-        document.querySelector('.hamburger').addEventListener('click', toggleSidebar);
+        document.querySelector('.toggle-btn').addEventListener('click', toggleSidebar);
+        document.querySelector('.sidebar-toggle').addEventListener('click', toggleMinimize);
 
-        const overlay = document.querySelector('.overlay');
-        if (overlay) {
-            overlay.addEventListener('click', toggleSidebar);
-        }
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.addEventListener('mouseenter', () => {
+            if (isSidebarVisible && isMinimized) {
+                sidebar.classList.remove('minimized');
+                sidebar.classList.add('expanded');
+                document.querySelector('.content').classList.remove('with-minimized-sidebar');
+                document.querySelector('.content').classList.add('with-sidebar');
+                document.querySelector('.footer').classList.remove('with-minimized-sidebar');
+                document.querySelector('.footer').classList.add('with-sidebar');
+                document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        });
+
+        sidebar.addEventListener('mouseleave', () => {
+            if (isSidebarVisible && isMinimized) {
+                sidebar.classList.add('minimized');
+                sidebar.classList.remove('expanded');
+                document.querySelector('.content').classList.remove('with-sidebar');
+                document.querySelector('.content').classList.add('with-minimized-sidebar');
+                document.querySelector('.footer').classList.remove('with-sidebar');
+                document.querySelector('.footer').classList.add('with-minimized-sidebar');
+                document.querySelector('.sidebar-toggle i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+            }
+        });
 
         document.addEventListener('touchmove', (e) => {
             if (document.body.classList.contains('sidebar-open') && !e.target.closest('.sidebar')) {
@@ -1503,7 +1765,7 @@
             const tutorialUnits = parseInt(document.getElementById('tutorialUnits').value) || 0;
             const courseType = document.getElementById('courseType').value;
             const isFreshmanEng = document.getElementById('isFreshmanEng').value === 'yes';
-            const discount = parseFloat(document.getElementById('discount').value || 0);
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
 
             const errorDiv = document.getElementById('tuition-error');
             const resultDiv = document.getElementById('tuition-result');
@@ -1521,17 +1783,10 @@
             let mandatoryFees = 1697;
             let labFees = 0;
             switch (courseType) {
-                case 'officeAdmin':
-                    labFees = 500;
-                    break;
-                case 'engineering':
-                    labFees = 1000;
-                    break;
-                case 'computer':
-                    labFees = 750;
-                    break;
-                default:
-                    labFees = 0;
+                case 'officeAdmin': labFees = 500; break;
+                case 'engineering': labFees = 1000; break;
+                case 'computer': labFees = 750; break;
+                default: labFees = 0;
             }
             
             let depositFee = isFreshmanEng ? 1000 : 0;
@@ -1576,162 +1831,27 @@
                 return;
             }
 
-            const finalGrade = (quizScore * quizWeight/100) + (projectScore * projectWeight/100) + (examScore * examWeight/100);
+            const finalGrade = (quizScore * quizWeight / 100) + (projectScore * projectWeight / 100) + (examScore * examWeight / 100);
             
             let letterGrade, status;
-            if (finalGrade >= 97) {
-                letterGrade = 'A+';
-                status = 'Excellent';
-            } else if (finalGrade >= 94) {
-                letterGrade = 'A';
-                status = 'Very Good';
-            } else if (finalGrade >= 90) {
-                letterGrade = 'A-';
-                status = 'Very Good';
-            } else if (finalGrade >= 85) {
-                letterGrade = 'B+';
-                status = 'Good';
-            } else if (finalGrade >= 80) {
-                letterGrade = 'B';
-                status = 'Satisfactory';
-            } else if (finalGrade >= 78) {
-                letterGrade = 'B-';
-                status = 'Fair';
-            } else if (finalGrade >= 75) {
-                letterGrade = 'C';
-                status = 'Passed';
-            } else {
-                letterGrade = 'F';
-                status = 'Failed';
-            }
+            if (finalGrade >= 97) { letterGrade = 'A+'; status = 'Excellent'; }
+            else if (finalGrade >= 94) { letterGrade = 'A'; status = 'Very Good'; }
+            else if (finalGrade >= 90) { letterGrade = 'A-'; status = 'Very Good'; }
+            else if (finalGrade >= 85) { letterGrade = 'B+'; status = 'Good'; }
+            else if (finalGrade >= 80) { letterGrade = 'B'; status = 'Satisfactory'; }
+            else if (finalGrade >= 78) { letterGrade = 'B-'; status = 'Fair'; }
+            else if (finalGrade >= 75) { letterGrade = 'C'; status = 'Passed'; }
+            else { letterGrade = 'F'; status = 'Failed'; }
 
             resultDiv.innerHTML = `
                 <div class="result-value">Final Grade: ${finalGrade.toFixed(2)}% (${letterGrade})</div>
                 <div style="margin-top: 1rem;">
                     <strong>Status:</strong> ${status}<br>
                     <strong>Grade Breakdown:</strong><br>
-                    • Quiz: ${quizScore}% × ${quizWeight}% = ${(quizScore * quizWeight/100).toFixed(2)}<br>
-                    • Project: ${projectScore}% × ${projectWeight}% = ${(projectScore * projectWeight/100).toFixed(2)}<br>
-                    • Exam: ${examScore}% × ${examWeight}% = ${(examScore * examWeight/100).toFixed(2)}<br>
+                    • Quiz: ${quizScore}% × ${quizWeight}% = ${(quizScore * quizWeight / 100).toFixed(2)}<br>
+                    • Project: ${projectScore}% × ${projectWeight}% = ${(projectScore * projectWeight / 100).toFixed(2)}<br>
+                    • Exam: ${examScore}% × ${examWeight}% = ${(examScore * examWeight / 100).toFixed(2)}<br>
                     <br><strong>Final: ${finalGrade.toFixed(2)}%</strong>
-                </div>
-            `;
-            resultDiv.style.display = 'block';
-        }
-
-        function addSubject() {
-            const container = document.getElementById('gwa-subjects');
-            const subjectEntry = document.createElement('div');
-            subjectEntry.className = 'form-grid subject-entry';
-            subjectEntry.innerHTML = `
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-book"></i> Subject Name
-                    </label>
-                    <input type="text" class="form-input subject-name" placeholder="e.g., Physics">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-weight"></i> Units
-                    </label>
-                    <input type="number" class="form-input subject-units" min="1" max="5" value="3">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-star"></i> Grade (1.0-5.0)
-                    </label>
-                    <input type="number" class="form-input subject-grade" min="1" max="5" step="0.25" value="1.75">
-                </div>
-                
-                <div class="form-group" style="display: flex; align-items: end;">
-                    <button type="button" class="btn-secondary" onclick="removeSubject(this)" style="margin-top: 0; width: auto; padding: 0.5rem 1rem;">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </div>
-            `;
-            container.appendChild(subjectEntry);
-        }
-
-        function removeSubject(button) {
-            button.closest('.subject-entry').remove();
-        }
-
-        function calculateGWA() {
-            const subjects = document.querySelectorAll('.subject-entry');
-            const errorDiv = document.getElementById('gwa-error');
-            const resultDiv = document.getElementById('gwa-result');
-
-            errorDiv.style.display = 'none';
-            resultDiv.style.display = 'none';
-
-            if (subjects.length === 0) {
-                errorDiv.innerHTML = '<strong>Error:</strong> Please add at least one subject.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            let totalWeightedGrades = 0;
-            let totalUnits = 0;
-            let subjectDetails = [];
-
-            for (let subject of subjects) {
-                const name = subject.querySelector('.subject-name').value.trim();
-                const units = parseFloat(subject.querySelector('.subject-units').value) || 0;
-                const grade = parseFloat(subject.querySelector('.subject-grade').value) || 0;
-
-                if (!name) {
-                    errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all subject names.';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-
-                if (units <= 0 || grade < 1 || grade > 5) {
-                    errorDiv.innerHTML = '<strong>Error:</strong> Please enter valid units and grades for all subjects.';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-
-                totalWeightedGrades += grade * units;
-                totalUnits += units;
-                subjectDetails.push({ name, units, grade });
-            }
-
-            const gwa = totalWeightedGrades / totalUnits;
-            
-            let standing;
-            if (gwa <= 1.24) {
-                standing = 'Excellent';
-            } else if (gwa <= 1.49) {
-                standing = 'Very Good';
-            } else if (gwa <= 1.74) {
-                standing = 'Very Good';
-            } else if (gwa <= 2.24) {
-                standing = 'Good';
-            } else if (gwa <= 2.74) {
-                standing = 'Satisfactory';
-            } else if (gwa <= 2.99) {
-                standing = 'Fair';
-            } else if (gwa <= 3.00) {
-                standing = 'Passed';
-            } else {
-                standing = 'Failed';
-            }
-
-            let detailsHTML = '<strong>Subject Breakdown:</strong><br>';
-            subjectDetails.forEach(subject => {
-                detailsHTML += `• ${subject.name}: ${subject.units} units × ${subject.grade} = ${(subject.units * subject.grade).toFixed(2)}<br>`;
-            });
-
-            resultDiv.innerHTML = `
-                <div class="result-value">GWA: ${gwa.toFixed(2)}</div>
-                <div style="margin-top: 1rem;">
-                    <strong>Academic Standing:</strong> ${standing}<br>
-                    ${detailsHTML}
-                    <br><strong>Total Units:</strong> ${totalUnits}<br>
-                    <strong>Total Weighted Grades:</strong> ${totalWeightedGrades.toFixed(2)}<br>
-                    <strong>GWA:</strong> ${gwa.toFixed(2)}
                 </div>
             `;
             resultDiv.style.display = 'block';
@@ -1746,13 +1866,11 @@
             const endTime = document.getElementById('endTime').value;
 
             const errorDiv = document.getElementById('schedule-error');
-            const displayDiv = document.getElementById('schedule-display');
-            const scheduleBody = document.getElementById('schedule-body');
 
             errorDiv.style.display = 'none';
 
-            if (!subjectName || !instructor || !room || !startTime || !endTime) {
-                errorDiv.innerHTML = '<strong>Error:</strong> Please fill in all fields.';
+            if (!subjectName || !startTime || !endTime) {
+                errorDiv.innerHTML = '<strong>Error:</strong> Please fill in subject name and times.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -1763,22 +1881,10 @@
                 return;
             }
 
-            scheduleEntries.push({
-                subject: subjectName,
-                instructor,
-                room,
-                day,
-                startTime,
-                endTime,
-                color: `color-${colorIndex % 5}`
-            });
+            const newEntry = { subjectName, instructor, room, day, startTime, endTime, color: colorIndex % 5 };
             colorIndex++;
-
-            scheduleEntries.sort((a, b) => a.startTime.localeCompare(b.startTime));
-
+            scheduleEntries.push(newEntry);
             updateScheduleTable();
-
-            displayDiv.style.display = 'block';
 
             document.getElementById('subjectName').value = '';
             document.getElementById('instructor').value = '';
@@ -1788,58 +1894,65 @@
         }
 
         function updateScheduleTable() {
-            const scheduleBody = document.getElementById('schedule-body');
-            scheduleBody.innerHTML = '';
+            const tbody = document.getElementById('schedule-body');
+            const display = document.getElementById('schedule-display');
+            tbody.innerHTML = '';
 
-            const timeSlots = {};
-            scheduleEntries.forEach(entry => {
-                const timeKey = `${entry.startTime}-${entry.endTime}`;
-                if (!timeSlots[timeKey]) {
-                    timeSlots[timeKey] = {
-                        startTime: entry.startTime,
-                        endTime: entry.endTime,
-                        days: { Monday: null, Tuesday: null, Wednesday: null, Thursday: null, Friday: null, Saturday: null }
-                    };
-                }
-                timeSlots[timeKey].days[entry.day] = entry;
-            });
+            if (scheduleEntries.length === 0) {
+                display.style.display = 'none';
+                return;
+            }
 
-            Object.values(timeSlots).forEach(slot => {
+            display.style.display = 'block';
+
+            const timeSlots = generateTimeSlots();
+            timeSlots.forEach(slot => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${slot.startTime} - ${slot.endTime}</td>
-                    <td class="${slot.days.Monday ? slot.days.Monday.color : ''}">${slot.days.Monday ? formatScheduleEntry(slot.days.Monday) : ''}</td>
-                    <td class="${slot.days.Tuesday ? slot.days.Tuesday.color : ''}">${slot.days.Tuesday ? formatScheduleEntry(slot.days.Tuesday) : ''}</td>
-                    <td class="${slot.days.Wednesday ? slot.days.Wednesday.color : ''}">${slot.days.Wednesday ? formatScheduleEntry(slot.days.Wednesday) : ''}</td>
-                    <td class="${slot.days.Thursday ? slot.days.Thursday.color : ''}">${slot.days.Thursday ? formatScheduleEntry(slot.days.Thursday) : ''}</td>
-                    <td class="${slot.days.Friday ? slot.days.Friday.color : ''}">${slot.days.Friday ? formatScheduleEntry(slot.days.Friday) : ''}</td>
-                    <td class="${slot.days.Saturday ? slot.days.Saturday.color : ''}">${slot.days.Saturday ? formatScheduleEntry(slot.days.Saturday) : ''}</td>
-                `;
-                scheduleBody.appendChild(row);
+                row.innerHTML = `<td>${slot}</td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+                scheduleEntries.forEach(entry => {
+                    if (isTimeInSlot(slot, entry.startTime, entry.endTime)) {
+                        const dayIndex = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(entry.day) + 1;
+                        row.cells[dayIndex].innerHTML = `
+                            <div class="color-${entry.color}">
+                                <strong>${entry.subjectName}</strong><br>
+                                ${entry.instructor ? `Prof. ${entry.instructor}<br>` : ''}
+                                ${entry.room ? `Room ${entry.room}<br>` : ''}
+                                ${entry.startTime} - ${entry.endTime}
+                            </div>
+                        `;
+                        row.cells[dayIndex].setAttribute('data-day', entry.day);
+                    }
+                });
+                tbody.appendChild(row);
             });
         }
 
-        function formatScheduleEntry(entry) {
-            return `
-                <strong>${entry.subject}</strong><br>
-                ${entry.instructor}<br>
-                ${entry.room}
-            `;
+        function generateTimeSlots() {
+            const slots = [];
+            for (let hour = 7; hour <= 20; hour++) {
+                slots.push(`${hour}:00 - ${hour + 1}:00`);
+            }
+            return slots;
+        }
+
+        function isTimeInSlot(slot, startTime, endTime) {
+            const [slotStart, slotEnd] = slot.split(' - ').map(t => parseInt(t.split(':')[0]));
+            const startHour = parseInt(startTime.split(':')[0]);
+            const endHour = parseInt(endTime.split(':')[0]);
+            return startHour <= slotEnd && endHour >= slotStart;
         }
 
         function clearSchedule() {
             scheduleEntries = [];
             colorIndex = 0;
-            document.getElementById('schedule-body').innerHTML = '';
-            document.getElementById('schedule-display').style.display = 'none';
-            document.getElementById('schedule-error').style.display = 'none';
+            updateScheduleTable();
         }
 
         function checkStudyLoad() {
             const totalUnits = parseInt(document.getElementById('totalUnits').value) || 0;
             const majorSubjects = parseInt(document.getElementById('majorSubjects').value) || 0;
             const labSubjects = parseInt(document.getElementById('labSubjects').value) || 0;
-            const yearLevel = parseInt(document.getElementById('yearLevel').value);
+            const yearLevel = parseInt(document.getElementById('yearLevel').value) || 1;
 
             const resultDiv = document.getElementById('load-result');
             const statsDiv = document.getElementById('load-stats');
@@ -1847,56 +1960,48 @@
             const hoursStat = document.getElementById('hours-stat');
             const difficultyStat = document.getElementById('difficulty-stat');
 
-            if (totalUnits < 1 || totalUnits > 30 || majorSubjects < 0 || labSubjects < 0) {
-                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid values for units and subjects.';
+            resultDiv.style.display = 'none';
+            statsDiv.style.display = 'none';
+
+            if (totalUnits < 1 || totalUnits > 30) {
+                resultDiv.innerHTML = '<strong>Error:</strong> Total units must be between 1 and 30.';
                 resultDiv.style.display = 'block';
-                statsDiv.style.display = 'none';
                 return;
             }
 
-            const lectureHours = totalUnits - labSubjects;
-            const labHours = labSubjects * 2;
-            const totalStudyHours = lectureHours + labHours;
-
-            let difficultyLevel, difficultyColor;
-            if (totalUnits > 21 || majorSubjects > 5 || labSubjects > 3) {
-                difficultyLevel = 'Heavy';
-                difficultyColor = '#ef4444';
-            } else if (totalUnits > 18 || majorSubjects > 4 || labSubjects > 2) {
-                difficultyLevel = 'Moderate';
-                difficultyColor = '#f59e0b';
+            const studyHours = totalUnits * 2 + labSubjects * 2 + majorSubjects * 1;
+            let status, recommendation;
+            if (totalUnits <= 15) {
+                status = 'Light';
+                recommendation = 'You have a manageable load. Consider adding extracurricular activities.';
+            } else if (totalUnits <= 21) {
+                status = 'Balanced';
+                recommendation = 'Your load is balanced. Maintain a consistent study schedule.';
             } else {
-                difficultyLevel = 'Light';
-                difficultyColor = '#10b981';
+                status = 'Heavy';
+                recommendation = 'Your load is heavy. Prioritize time management and seek support if needed.';
             }
 
-            const maxRecommendedUnits = {
-                1: 18,
-                2: 21,
-                3: 24,
-                4: 24,
-                5: 21
-            };
-            const isOverloaded = totalUnits > maxRecommendedUnits[yearLevel];
+            if (yearLevel <= 2 && totalUnits > 24) {
+                recommendation += ' First or second-year students should avoid overloading.';
+            }
 
             resultDiv.innerHTML = `
-                <div class="result-value">Study Load: ${difficultyLevel}</div>
+                <div class="result-value">Study Load Status: ${status}</div>
                 <div style="margin-top: 1rem;">
-                    <strong>Analysis:</strong><br>
+                    <strong>Details:</strong><br>
                     • Total Units: ${totalUnits}<br>
                     • Major Subjects: ${majorSubjects}<br>
                     • Laboratory Subjects: ${labSubjects}<br>
-                    • Estimated Study Hours/Week: ${totalStudyHours}<br>
-                    • Year Level: ${yearLevel}th Year<br>
-                    ${isOverloaded ? `<strong style="color: #ef4444;">Warning:</strong> Your load exceeds the recommended ${maxRecommendedUnits[yearLevel]} units for ${yearLevel}th year.` : '<strong style="color: #10b981;">Good:</strong> Your load is within recommended limits.'}
+                    • Estimated Study Hours/Week: ${studyHours}<br>
+                    <br><strong>Recommendation:</strong> ${recommendation}
                 </div>
             `;
             resultDiv.style.display = 'block';
 
             unitsStat.textContent = totalUnits;
-            hoursStat.textContent = totalStudyHours;
-            difficultyStat.textContent = difficultyLevel;
-            difficultyStat.style.color = difficultyColor;
+            hoursStat.textContent = studyHours;
+            difficultyStat.textContent = status;
             statsDiv.style.display = 'grid';
         }
 
@@ -1910,37 +2015,48 @@
 
             const resultDiv = document.getElementById('budget-result');
             const statsDiv = document.getElementById('budget-stats');
-            const totalIncomeDiv = document.getElementById('total-income');
-            const totalExpensesDiv = document.getElementById('total-expenses');
-            const remainingBudgetDiv = document.getElementById('remaining-budget');
+            const totalIncomeEl = document.getElementById('total-income');
+            const totalExpensesEl = document.getElementById('total-expenses');
+            const remainingBudgetEl = document.getElementById('remaining-budget');
 
-            const semesterIncome = monthlyAllowance * 5;
-            const semesterTransportation = transportationCost * 5;
-            const semesterFood = foodCost * 5;
-            const semesterMiscellaneous = miscellaneous * 5;
-            const totalExpenses = tuitionFees + semesterTransportation + semesterFood + booksCost + semesterMiscellaneous;
-            const remainingBudget = semesterIncome - totalExpenses;
+            resultDiv.style.display = 'none';
+            statsDiv.style.display = 'none';
+
+            const semesterMonths = 5;
+            const totalIncome = monthlyAllowance * semesterMonths;
+            const monthlyExpenses = transportationCost + foodCost + miscellaneous;
+            const totalExpenses = (monthlyExpenses * semesterMonths) + tuitionFees + booksCost;
+            const remainingBudget = totalIncome - totalExpenses;
+
+            let status, advice;
+            if (remainingBudget >= 0) {
+                status = 'Surplus';
+                advice = 'You have enough budget. Consider saving the surplus for emergencies.';
+            } else {
+                status = 'Deficit';
+                advice = 'Your expenses exceed your budget. Review and reduce non-essential costs.';
+            }
 
             resultDiv.innerHTML = `
-                <div class="result-value">Remaining Budget: ₱${remainingBudget.toLocaleString()}</div>
+                <div class="result-value">${status}: ₱${Math.abs(remainingBudget).toLocaleString()}</div>
                 <div style="margin-top: 1rem;">
-                    <strong>Financial Summary (Per Semester):</strong><br>
-                    • Income (Allowance × 5 months): ₱${semesterIncome.toLocaleString()}<br>
+                    <strong>Breakdown:</strong><br>
+                    • Semester Income (${monthlyAllowance} × ${semesterMonths}): ₱${totalIncome.toLocaleString()}<br>
                     • Tuition & Fees: ₱${tuitionFees.toLocaleString()}<br>
-                    • Transportation (₱${transportationCost}/month × 5): ₱${semesterTransportation.toLocaleString()}<br>
-                    • Food & Meals (₱${foodCost}/month × 5): ₱${semesterFood.toLocaleString()}<br>
+                    • Transportation (${transportationCost} × ${semesterMonths}): ₱${(transportationCost * semesterMonths).toLocaleString()}<br>
+                    • Food & Meals (${foodCost} × ${semesterMonths}): ₱${(foodCost * semesterMonths).toLocaleString()}<br>
                     • Books & Supplies: ₱${booksCost.toLocaleString()}<br>
-                    • Miscellaneous (₱${miscellaneous}/month × 5): ₱${semesterMiscellaneous.toLocaleString()}<br>
-                    <br><strong>Total Expenses: ₱${totalExpenses.toLocaleString()}</strong><br>
-                    <strong>Remaining: ₱${remainingBudget.toLocaleString()}</strong><br>
-                    ${remainingBudget < 0 ? '<strong style="color: #ef4444;">Warning:</strong> You are overspending by ₱${Math.abs(remainingBudget).toLocaleString()}. Consider reducing expenses.' : '<strong style="color: #10b981;">Good:</strong> You have a surplus of ₱${remainingBudget.toLocaleString()} for the semester.'}
+                    • Miscellaneous (${miscellaneous} × ${semesterMonths}): ₱${(miscellaneous * semesterMonths).toLocaleString()}<br>
+                    <br><strong>Total Expenses:</strong> ₱${totalExpenses.toLocaleString()}<br>
+                    <strong>Remaining Budget:</strong> ₱${remainingBudget.toLocaleString()}<br>
+                    <br><strong>Advice:</strong> ${advice}
                 </div>
             `;
             resultDiv.style.display = 'block';
 
-            totalIncomeDiv.textContent = `₱${semesterIncome.toLocaleString()}`;
-            totalExpensesDiv.textContent = `₱${totalExpenses.toLocaleString()}`;
-            remainingBudgetDiv.textContent = `₱${remainingBudget.toLocaleString()}`;
+            totalIncomeEl.textContent = `₱${totalIncome.toLocaleString()}`;
+            totalExpensesEl.textContent = `₱${totalExpenses.toLocaleString()}`;
+            remainingBudgetEl.textContent = `₱${remainingBudget.toLocaleString()}`;
             statsDiv.style.display = 'grid';
         }
 
@@ -1951,50 +2067,56 @@
 
             const resultDiv = document.getElementById('internship-result');
             const statsDiv = document.getElementById('internship-stats');
-            const completionPercentageDiv = document.getElementById('completion-percentage');
-            const remainingHoursDiv = document.getElementById('remaining-hours');
-            const estimatedDaysDiv = document.getElementById('estimated-days');
+            const completionPercentageEl = document.getElementById('completion-percentage');
+            const remainingHoursEl = document.getElementById('remaining-hours');
+            const estimatedDaysEl = document.getElementById('estimated-days');
 
-            if (!startDate || !lastWorkedDate || isNaN(startDate) || isNaN(lastWorkedDate) || requiredHours <= 0) {
-                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid dates and required hours.';
+            resultDiv.style.display = 'none';
+            statsDiv.style.display = 'none';
+
+            if (!startDate || !lastWorkedDate || lastWorkedDate < startDate) {
+                resultDiv.innerHTML = '<strong>Error:</strong> Please enter valid dates, with last worked date after start date.';
                 resultDiv.style.display = 'block';
-                statsDiv.style.display = 'none';
                 return;
             }
 
-            if (lastWorkedDate < startDate) {
-                resultDiv.innerHTML = '<strong>Error:</strong> Last worked date must be after start date.';
-                resultDiv.style.display = 'block';
-                statsDiv.style.display = 'none';
-                return;
-            }
-
-            const daysWorked = Math.ceil((lastWorkedDate - startDate) / (1000 * 60 * 60 * 24));
+            const workDays = Math.ceil((lastWorkedDate - startDate) / (1000 * 60 * 60 * 24));
             const hoursPerDay = 8;
-            const totalHoursWorked = daysWorked * hoursPerDay;
-            const hoursRemaining = Math.max(0, requiredHours - totalHoursWorked);
-            const completionPercentage = ((totalHoursWorked / requiredHours) * 100).toFixed(2);
-            const estimatedDaysRemaining = Math.ceil(hoursRemaining / hoursPerDay);
+            const completedHours = workDays * hoursPerDay;
+            const remainingHours = requiredHours - completedHours;
+            const completionPercentage = (completedHours / requiredHours) * 100;
+            const estimatedDaysLeft = remainingHours > 0 ? Math.ceil(remainingHours / hoursPerDay) : 0;
+
+            let status;
+            if (completionPercentage >= 100) {
+                status = 'Completed';
+            } else if (completionPercentage >= 75) {
+                status = 'Nearing Completion';
+            } else if (completionPercentage >= 50) {
+                status = 'Halfway';
+            } else {
+                status = 'In Progress';
+            }
 
             resultDiv.innerHTML = `
-                <div class="result-value">Completion: ${completionPercentage}%</div>
+                <div class="result-value">Progress: ${completionPercentage.toFixed(2)}%</div>
                 <div style="margin-top: 1rem;">
-                    <strong>Internship Progress:</strong><br>
+                    <strong>Details:</strong><br>
                     • Required Hours: ${requiredHours}<br>
-                    • Days Worked: ${daysWorked}<br>
-                    • Hours Worked: ${totalHoursWorked}<br>
-                    • Hours Remaining: ${hoursRemaining}<br>
-                    • Estimated Days to Complete: ${estimatedDaysRemaining}<br>
-                    ${hoursRemaining === 0 ? '<strong style="color: #10b981;">Congratulations!</strong> You have completed your required hours.' : `<strong style="color: #f59e0b;">Keep Going:</strong> You need ${hoursRemaining} more hours to complete your internship.`}
+                    • Completed Hours: ${completedHours}<br>
+                    • Remaining Hours: ${remainingHours}<br>
+                    • Work Days So Far: ${workDays}<br>
+                    • Estimated Days Left: ${estimatedDaysLeft}<br>
+                    <br><strong>Status:</strong> ${status}
                 </div>
             `;
             resultDiv.style.display = 'block';
 
-            completionPercentageDiv.textContent = `${completionPercentage}%`;
-            remainingHoursDiv.textContent = hoursRemaining;
-            estimatedDaysDiv.textContent = estimatedDaysRemaining;
+            completionPercentageEl.textContent = `${completionPercentage.toFixed(2)}%`;
+            remainingHoursEl.textContent = remainingHours;
+            estimatedDaysEl.textContent = estimatedDaysLeft;
             statsDiv.style.display = 'grid';
         }
-    </script>
+</script>
 </body>
 </html>
